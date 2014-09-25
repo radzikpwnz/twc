@@ -12,8 +12,10 @@
 
 #include "object.h"
 
-
-RT_OBJECT *NewObject( UINT ctrl_id)
+/**
+ * Create new object.
+ */
+RT_OBJECT *NewObject( UINT ctrl_id) /* control ID */
 {
     RT_OBJECT *obj;
 
@@ -31,7 +33,11 @@ RT_OBJECT *NewObject( UINT ctrl_id)
     return obj;
 }
 
-RT_OBJECT *CopyObject(RT_OBJECT *obj, RT_OBJECT *parent)
+/**
+ * Copy object.
+ */
+RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
+                       RT_OBJECT *parent) /* parent of object's copy */
 {
     RT_OBJECT *new_obj;
     PROPERTY_INFO *propinfo;
@@ -70,7 +76,10 @@ RT_OBJECT *CopyObject(RT_OBJECT *obj, RT_OBJECT *parent)
     return new_obj;
 }
 
-int FreeObject(RT_OBJECT *obj)
+/**
+ * Free object.
+ */
+int FreeObject(RT_OBJECT *obj) /* object */
 {
     PROPERTY_INFO *propinfo;
     UINT prop_id, prop_count;
@@ -100,7 +109,13 @@ int FreeObject(RT_OBJECT *obj)
     return 1;
 }
 
-void PrepareObject( RT_OBJECT *obj)
+/**
+ * Prepare object before creating it's window.
+ *
+ * Load default values for all properties and
+ * set styles not covered by properties.
+ */
+void PrepareObject( RT_OBJECT *obj) /* object */
 {
     //Load defaults for all properties
     SetObjectPropertyDefaultValue( obj, PROPERTIES_ALL);
@@ -120,7 +135,10 @@ void PrepareObject( RT_OBJECT *obj)
     return;
 }
 
-void SetNewObjectDefaultValues( RT_OBJECT *obj)
+/**
+ * Set default values for new control.
+ */
+void SetNewObjectDefaultValues( RT_OBJECT *obj) /* object */
 {
     switch ( obj->ctrl_id ) {
         case CTRL_ID_WINDOW:
@@ -148,47 +166,50 @@ void SetNewObjectDefaultValues( RT_OBJECT *obj)
         case CTRL_ID_GROUPBOX:
             SetObjectPropertyStr( obj, COMMON_TITLE, T("Group box"), TWC_TRUE, TWC_FALSE);
             break;
-        //case CTRL_ID_SLIDER:
-            //break;
-        //case CTRL_ID_PROGRESSBAR:
-            //break;
-        //case CTRL_ID_IPADDRESS:
-            //break;
-        //case CTRL_ID_DATETIME:
-            //ctrlinfo->style |= DTS_SHOWNONE;
-            //break;
-        //case CTRL_ID_SCROLLBAR:
-            //break;
-        //case CTRL_ID_UPDOWN:
-            //break;
     }
 
     return;
 }
 
-static int CreateStaticOnControl( RT_OBJECT *obj)
+/**
+ * Create static on control.
+ */
+static int CreateStaticOnControl( RT_OBJECT *obj) /* object */
 {
     HWND hwnd;
-   
+
+    TWC_CHECKIT( obj->ctrl_id != CTRL_ID_WINDOW );
+
     hwnd = CreateWindowEx( 0, WC_STATIC, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, obj->x, obj->y, obj->width, obj->height,
                     obj->parent->hwnd, NULL, GetModuleHandle(NULL), 0);
+    if ( hwnd == NULL ) {
+        return 0;
+    }
     obj->static_hwnd = hwnd;
 
+    /* Set OBJECT_INFO property and window procedure */
     SetProp( hwnd, T("OBJECT_INFO"), (HANDLE)obj);
     obj->static_orig_wndproc = (WNDPROC)SetWindowLongPtr( hwnd, GWLP_WNDPROC, (LONG_PTR)StaticWndProc);
 
+    /* Set z-order */
     SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE); //TODO: find exact zorder
 
     return 1;
 }
 
-static int InitObjectAfterCreation(RT_OBJECT *obj, HWND insert_after)
+/**
+ * Object initialization after it's been created.
+ */
+static int InitObjectAfterCreation( RT_OBJECT *obj,    /* object */
+                                    HWND insert_after) /* insert after in z-order */
 {
+    /* Set OBJECT_INFO property and window procedure */
     SetProp( obj->hwnd, TEXT("OBJECT_INFO"), (HANDLE)obj);
     obj->orig_wndproc = (WNDPROC)SetWindowLongPtr( obj->hwnd, GWLP_WNDPROC,
-        (( obj->ctrl_id != CTRL_ID_WINDOW ) ? (LONG_PTR)ControlWndProc : (LONG_PTR)ChildWndProc));
+                        (( obj->ctrl_id != CTRL_ID_WINDOW ) ? (LONG_PTR)ControlWndProc : (LONG_PTR)ChildWndProc) );
 
     if ( obj->ctrl_id != CTRL_ID_WINDOW ) {
+        /* Set control position (need for some controls to do it twice), create static and set font */
         SetWindowPos( obj->hwnd, insert_after, obj->x, obj->y, obj->width, obj->height, 0);
         CreateStaticOnControl( obj);
         SendMessage( obj->hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), 0);
@@ -197,48 +218,62 @@ static int InitObjectAfterCreation(RT_OBJECT *obj, HWND insert_after)
     return 1;
 }
 
-int CreateObjectWindow( RT_OBJECT *obj, TWC_BOOL create_childs)
+/**
+ * Create object window.
+ */
+int CreateObjectWindow( RT_OBJECT *obj,         /* object */
+                        TWC_BOOL create_childs) /* TWC_TRUE for create childs */
 {
-    DLIST_NODE_PRT_OBJECT *cur_node;
     HWND parent_hwnd;
     DWORD mdi_style;
     RECT rect;
 
+    /* Determine parent HWND and MDI style */
     parent_hwnd = (obj->parent == NULL) ? MDIClient.hwnd : obj->parent->hwnd;
     mdi_style = ( parent_hwnd == MDIClient.hwnd ) ? WS_EX_MDICHILD : 0;
 
+    /* Make object window rect */
     rect.left = rect.top = 0;
     rect.right = obj->width;
     rect.bottom = obj->height;
     if ( obj->flags & OBJ_FLAG_CLIENTSIZE ) {
         AdjustWindowRectEx( &rect, obj->style, FALSE, obj->exstyle);
     }
+
+    /* Create window */
     obj->hwnd = CreateWindowEx( obj->exstyle | mdi_style, obj->classname, obj->title, StyleFilter(obj),
                                 obj->x, obj->y, rect.right - rect.left, rect.bottom - rect.top, parent_hwnd, NULL, GetModuleHandle(NULL), obj);
     if ( obj->hwnd == NULL ) {
         return 0;
     }
 
-    InitObjectAfterCreation( obj, HWND_TOP);
+    /* Initialize object */
+    if ( InitObjectAfterCreation( obj, HWND_TOP) == 0 ) {
+        return 0;
+    }
 
+    /* Create childs */
     if ( create_childs ) {
-        cur_node =  obj->child_list.first;
-        while ( cur_node != NULL ) {
-            if (CreateObjectWindow( cur_node->elem, TWC_TRUE) == 0) {
+        OBJ_LIST_ITERATE_BEGI( &obj->child_list);
+            if ( CreateObjectWindow( node->elem, TWC_TRUE) == 0 ) {
                 return 0;
             }
-            cur_node = cur_node->next;
-        }
+        OBJ_LIST_ITERATE_END();
     }
 
     return 1;
 }
 
-int DestroyObjectWindow( RT_OBJECT *obj, TWC_BOOL free_obj)
+/**
+ * Destroy object window and free object (if <free_obj> TRUE).
+ */
+int DestroyObjectWindow( RT_OBJECT *obj,    /* object */
+                         TWC_BOOL free_obj) /* TWC_TRUE for free object */
 {
     TWC_CHECKIT( obj != NULL );
     TWC_CHECKIT( !free_obj || obj != current_object );
 
+    /* Destroying childs */
     if ( obj->child_list.count != 0 ) {
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
             DestroyObjectWindow( node->elem, free_obj);
@@ -254,10 +289,14 @@ int DestroyObjectWindow( RT_OBJECT *obj, TWC_BOOL free_obj)
     return 1;
 }
 
-void SetCurrentObject(RT_OBJECT *obj)
+/**
+ * Set current object and load it's properties to property list.
+ */
+void SetCurrentObject( RT_OBJECT *obj) /* object */
 {
     RT_OBJECT *prev_obj;
 
+    /* Process changed properties */
     if ( current_object ) {
         SendMessage( hPropList, PL_PROCESSCHANGEDPROP, 0, 0);
     }
@@ -265,25 +304,32 @@ void SetCurrentObject(RT_OBJECT *obj)
     prev_obj = current_object;
     current_object = obj;
 
+    /* If current object is same as previous object, nothing to do */
     if ( current_object && current_object == prev_obj ) {
         return;
     }
 
+    /* Redraw previous object if it is not window */
     if ( prev_obj && prev_obj->ctrl_id != CTRL_ID_WINDOW ) {
         RedrawWindow( prev_obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 
+    /* Redraw current object if it is not window */
     if ( current_object && current_object != prev_obj && current_object->ctrl_id != CTRL_ID_WINDOW ) {
         RedrawWindow( current_object->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 
+    /* Load current object properties to property list */
     if ( current_object ) {
-        LoadPropertyList(hPropList, current_object);
+        LoadPropertyList( hPropList, current_object);
     }
     return;
 }
 
-DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj)
+/**
+ * Get parent child list.
+ */
+DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj) /* object */
 {
-    return (obj->parent == NULL) ? &cur_project.obj_list : &obj->parent->child_list;
+    return ( obj->parent == NULL ) ? &cur_project.obj_list : &obj->parent->child_list;
 }
