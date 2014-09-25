@@ -1,0 +1,90 @@
+TWCIL 1.0
+
+WND {
+	width=731
+	height=607
+	CTRL UPDOWN {
+		x=4
+		y=3
+		width=186
+		height=84
+	}
+	CTRL BUTTON {
+		x=4
+		y=89
+		width=186
+		height=91
+	}
+	CTRL CHECKBOX {
+		x=6
+		y=182
+		width=184
+		height=97
+	}
+	CTRL RADIOBUTTON {
+		x=5
+		y=282
+		width=188
+		height=94
+	}
+	CTRL GROUPBOX {
+		x=5
+		y=379
+		width=180
+		height=99
+	}
+	CTRL STATIC {
+		x=6
+		y=481
+		width=180
+		height=83
+	}
+	CTRL EDIT {
+		x=195
+		y=6
+		width=192
+		height=81
+	}
+	CTRL LISTBOX {
+		x=194
+		y=90
+		width=193
+		height=90
+	}
+	CTRL COMBOBOX {
+		x=195
+		y=187
+		width=192
+		height=21
+	}
+	CTRL SLIDER {
+		x=196
+		y=211
+		width=192
+		height=64
+	}
+	CTRL PROGRESSBAR {
+		x=198
+		y=278
+		width=196
+		height=70
+	}
+	CTRL DATETIME {
+		x=197
+		y=353
+		width=198
+		height=77
+	}
+	CTRL SCROLLBAR {
+		x=196
+		y=432
+		width=200
+		height=76
+	}
+	CTRL UPDOWN {
+		x=198
+		y=511
+		width=198
+		height=56
+	}
+}
