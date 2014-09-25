@@ -111,7 +111,7 @@ LRESULT CALLBACK CodeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			cur_wnd->hwnd = hwnd;
 			break;
 		case WM_CREATE:
-			cur_wnd->edit_hwnd = CreateWindowEx(0, ((msft_mod == NULL) ? RICHEDIT_CLASS : MSFTEDIT_CLASS), NULL, /*ES_WANTRETURN | */ WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 0, 0, 0, 0, cur_wnd->hwnd, NULL, GetModuleHandle(NULL), NULL);
+			cur_wnd->edit_hwnd = CreateWindowEx(0, /*((msft_mod == NULL) ? RICHEDIT_CLASS : */ MSFTEDIT_CLASS, NULL, /*ES_WANTRETURN | */ WS_HSCROLL | WS_VSCROLL | WS_CHILD | WS_VISIBLE | ES_MULTILINE | ES_AUTOHSCROLL | ES_AUTOVSCROLL, 0, 0, 0, 0, cur_wnd->hwnd, NULL, GetModuleHandle(NULL), NULL);
 			memset(&cf, 0, sizeof(cf));//ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_WANTRETURN | WS_BORDER | WS_VSCROLL | WS_HSCROLL
 			cf.dwMask = CFM_CHARSET | CFM_FACE | CFM_SIZE | CFM_OFFSET | CFM_COLOR;
 			cf.dwMask ^= CFM_ITALIC ^ CFM_BOLD ^ CFM_STRIKEOUT ^ CFM_UNDERLINE;

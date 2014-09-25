@@ -57,25 +57,31 @@ LRESULT CALLBACK ControlWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 
     switch ( msg ) {
         case WM_NCDESTROY:
+            /* Remove property and destroy static window */
             RemoveProp( hwnd, T("OBJECT_INFO"));
-            DestroyWindow( obj->hwnd);
+            DestroyWindow( obj->static_hwnd);
             break;
         case WM_MOVE:
+            /* Write new values to properties */
 			GetWindowRect( hwnd, &rect);
-			MapWindowPoints(HWND_DESKTOP, GetParent(hwnd), (POINT *)&rect, 1);
+			MapWindowPoints( HWND_DESKTOP, GetParent(hwnd), (POINT *)&rect, 1);
 			SetObjectPropertyInt(obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
             SetObjectPropertyInt(obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
 
+            /* Move static window */
             SetWindowPos( obj->static_hwnd, NULL, rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 			break;
 		case WM_SIZE:
+            /* Write new values to properties */
 			GetWindowRect( hwnd, &rect);
-			SetObjectPropertyInt(obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
-			SetObjectPropertyInt(obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
+			SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
+			SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
 
+            /* Size static window */
             SetWindowPos( obj->static_hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOZORDER);
 			break;
         case WM_NCHITTEST:
+            /* Do not react on mouse */
             return HTTRANSPARENT;
     }
 

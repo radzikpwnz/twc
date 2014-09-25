@@ -63,18 +63,49 @@ struct tagRT_OBJECT {
     HWND static_hwnd;
 };
 
-
+/**
+ * Create new object.
+ */
 RT_OBJECT *NewObject( UINT ctrl_id);
-RT_OBJECT *CopyObject(RT_OBJECT *obj, RT_OBJECT *parent);
-int FreeObject(RT_OBJECT *obj);
 
+/**
+ * Copy object.
+ */
+RT_OBJECT *CopyObject( RT_OBJECT *obj, RT_OBJECT *parent);
+
+/**
+ * Free object.
+ */
+int FreeObject( RT_OBJECT *obj);
+
+/**
+ * Prepare object before creating it's window.
+ */
 void PrepareObject( RT_OBJECT *obj);
+
+/**
+ * Set default values for new object.
+ */
 void SetNewObjectDefaultValues( RT_OBJECT *obj);
 
+/**
+ * Create object window.
+ */
 int CreateObjectWindow( RT_OBJECT *obj, TWC_BOOL create_childs);
+
+/**
+ * Destroy object window and free object (if <free_obj> TRUE).
+ */
 int DestroyObjectWindow( RT_OBJECT *obj, TWC_BOOL free_obj);
 
-void SetCurrentObject(RT_OBJECT *obj);
+/**
+ * Set current object and load it's properties to property list.
+ */
+void SetCurrentObject( RT_OBJECT *obj);
+
+/**
+ * Get parent object child list.
+ */
 DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj);
 
 

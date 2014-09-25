@@ -20,6 +20,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "toolbars.h"
 #include "mainwnd.h"
 #include "window.h"
+#include "static.h"
 
 /*
 #define VLD_FORCE_ENABLE
@@ -36,7 +37,7 @@ HWND hMainWnd;             /* Main window handle */
 HWND hPropList;            /* Property list handle */
 
 /**
- * Creates property list.
+ * Create property list.
  */
 static int CreatePropList()
 {
@@ -56,7 +57,7 @@ static int CreatePropList()
 }
 
 /**
- * Registers window classes
+ * Register window classes.
  */
 static int RegisterWindowClasses()
 {
@@ -85,41 +86,41 @@ static int RegisterWindowClasses()
 }
 
 /**
- * Program initialization
+ * Program initialization.
  */
 static int Init()
 {
-    /* Loading control cursors */
+    /* Load control cursors */
 	LoadControlCursors();
 
-    /* Registering window classes */
-    if ( RegisterWindowClasses() == 0 )
+    /* Register window classes */
+    if ( RegisterWindowClasses() == 0 ) {
         return 0;
     }
 
-    /* Initializing common controls library */
-    InitCommonControlsEx(NULL);
+    /* Initialize common controls library */
+    InitCommonControlsEx( NULL);
 
-    /* Initializing property list dll */
+    /* Initialize property list dll */
 	if ( InitPropertyListDll( GetModuleHandle(NULL)) == 0 ) {
         return 0;
     }
 
-    /* Initializing TWC and creating main window */
+    /* Initialize TWC and creating main window */
     if ( !twcInit() || !(twcCreateObject( &MainWnd, 1, HWND_DESKTOP)) ) {
         return 0;
     }
 	hMainWnd = MainWnd.hwnd;
 
-    /* Creating property list */
+    /* Create property list */
     if ( CreatePropList() == 0) {
         return 0;
     }
 
-    /* Setting status bar z-order(top) */
+    /* Set status bar z-order(top) */
     SetWindowPos( StatusBar.hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
-    /* Adding toolbox and toolbar buttons */
+    /* Add toolbox and toolbar buttons */
     AddToolboxButtons(Toolbox.hwnd);
 	AddMainToolbarButtons(MainToolbar.hwnd);
 
@@ -140,7 +141,7 @@ int CALLBACK WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdL
 
     /* Initialization */
     if ( Init() == 0 ) {
-        MessageBox( HWND_DESKTOP, T("Error during initialization!", T("Error"), 0),
+        MessageBox( HWND_DESKTOP, T("Error during initialization!"), T("Error"), 0);
     }
 
     /* Main loop */

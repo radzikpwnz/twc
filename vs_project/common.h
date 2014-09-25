@@ -59,17 +59,37 @@ extern int grid_size;
 extern int new_control;
 
 
-int SetString(TCHAR **str, TCHAR *new_str, int copy);
-
-void SetStatusText(TCHAR *str);
-
+/**
+ * Frees pointer and writes NULL to it.
+ */
 #define free(ptr) my_free(&(ptr))
 void my_free(void **p);
 
+/**
+ * Set one string to another.
+ *
+ * If <copy> is TRUE, copies new_str to str.
+ */
+int SetString(TCHAR **str, TCHAR *new_str, int copy);
+
+/**
+ * Set status text.
+ */
+void SetStatusText(TCHAR *str);
+
+/**
+ * Copy string and return pointer to destination's end (terminating 0).
+ */
 TCHAR *_mytcscpy(TCHAR *dest, const TCHAR *source);
 
+/**
+ * Get program version string.
+ */
 const TCHAR *GetProgramVersion();
 
+/**
+ * Terminate program and show error message.
+ */
 void twc_Fatal( TCHAR *file, int line);
 
 #endif

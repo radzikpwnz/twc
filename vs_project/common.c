@@ -11,7 +11,7 @@ TCHAR program_version_str[] = T("1.0 beta 5");
 #undef free
 
 /**
- * Frees pointer and writes NULL to it
+ * Frees pointer and writes NULL to it.
  */
 void my_free(void **p)
 {
@@ -24,8 +24,6 @@ void my_free(void **p)
 
 /**
  * Set one string to another.
- *
- * If <copy> is TRUE, copies new_str to str.
  */
 int SetString( TCHAR **str, TCHAR *new_str, int copy)
 {

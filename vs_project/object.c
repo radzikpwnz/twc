@@ -19,13 +19,16 @@ RT_OBJECT *NewObject( UINT ctrl_id) /* control ID */
 {
     RT_OBJECT *obj;
 
+    /* Alloc memory for RT_OBJECT */
     obj = (RT_OBJECT *)calloc( 1, sizeof(RT_OBJECT));
-    memset( obj, 0, sizeof(RT_OBJECT));
 
+    /* Init */
+    memset( obj, 0, sizeof(RT_OBJECT));
     DListInit( &obj->child_list, sizeof(PRT_OBJECT));
 
     obj->ctrl_id = ctrl_id;
     if ( ctrl_id != CTRL_ID_UNDEFINED ) {
+        /* Alloc memory for properties */
         obj->classname = GetControlClassname( ctrl_id);
         obj->properties = (PROPERTY *)calloc( 1, GetControlPropertiesCount( ctrl_id) * sizeof(PROPERTY));
     }
@@ -44,23 +47,28 @@ RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
     VALUE *val;
     UINT prop_id, prop_count;
 
+    /* Create new object and copy obj bytewise */
     new_obj = NewObject( obj->ctrl_id);
-
     memcpy( new_obj, obj, sizeof(RT_OBJECT));
 
-    new_obj->classname = obj->classname; //TODO: COPY
+    /* Copy classname */
+    new_obj->classname = obj->classname; //TODO: COPY!
+    /* Set parent */
     new_obj->parent = parent;
 
+    /* Null some window-specific fields and selection flag*/
     new_obj->hwnd = 0;
     new_obj->selected = 0;
     new_obj->orig_wndproc = NULL;
     new_obj->static_orig_wndproc = NULL;
     new_obj->static_hwnd = NULL;
 
+    /* Copy properties */
     prop_count = GetControlPropertiesCount( obj->ctrl_id);
     new_obj->properties = malloc( prop_count * sizeof(PROPERTY));
     memcpy( new_obj->properties, obj->properties, prop_count * sizeof(PROPERTY));
 
+    /* Copy strings for string properties */
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
         val = GetObjectPropertyVal( new_obj, prop_id);
@@ -69,8 +77,11 @@ RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
         }
     }
 
+    /* Generate object name and make title point to title property value */
     GenerateObjectName(new_obj);
     new_obj->title = GetObjectPropertyVal(new_obj, COMMON_TITLE)->s;
+
+    /* Add object to parent's child list */
     new_obj->lstnode_ptr = DListAdd( GetParentChildList( new_obj), (void *)-1, &new_obj);
 
     return new_obj;
@@ -79,7 +90,7 @@ RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
 /**
  * Free object.
  */
-int FreeObject(RT_OBJECT *obj) /* object */
+int FreeObject( RT_OBJECT *obj) /* object */
 {
     PROPERTY_INFO *propinfo;
     UINT prop_id, prop_count;
@@ -88,12 +99,14 @@ int FreeObject(RT_OBJECT *obj) /* object */
 
     TWC_CHECKIT( obj != current_object );
 
+    /* Free child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
         FreeObject( node->elem);
     OBJ_LIST_ITERATE_END();
 
     TWC_CHECKIT( obj->child_list.count == 0 );
 
+    /* Free string values of properties */
     prop_count = GetControlPropertiesCount( obj->ctrl_id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
@@ -103,7 +116,9 @@ int FreeObject(RT_OBJECT *obj) /* object */
     }
     free( obj->properties);
 
+    /* Delete object from parent's child list */
     DListRemove( GetParentChildList( obj), obj->lstnode_ptr);
+
     free(obj);
 
     return 1;
@@ -117,13 +132,13 @@ int FreeObject(RT_OBJECT *obj) /* object */
  */
 void PrepareObject( RT_OBJECT *obj) /* object */
 {
-    //Load defaults for all properties
+    /* Load defaults for all properties */
     SetObjectPropertyDefaultValue( obj, PROPERTIES_ALL);
 
-    //Set styles, witch not covered by properties
+    /* Set styles, witch not covered by properties */
     if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
         obj->style |= WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS/* | WS_CLIPCHILDREN*/;
-        //obj->exstyle = WS_EX_COMPOSITED;
+        /* obj->exstyle = WS_EX_COMPOSITED */;
     } else {
         obj->style |= WS_CHILD/* | WS_CLIPSIBLINGS*/;
         switch ( obj->ctrl_id ) {
@@ -136,7 +151,7 @@ void PrepareObject( RT_OBJECT *obj) /* object */
 }
 
 /**
- * Set default values for new control.
+ * Set default values for new object.
  */
 void SetNewObjectDefaultValues( RT_OBJECT *obj) /* object */
 {
@@ -254,7 +269,7 @@ int CreateObjectWindow( RT_OBJECT *obj,         /* object */
 
     /* Create childs */
     if ( create_childs ) {
-        OBJ_LIST_ITERATE_BEGI( &obj->child_list);
+        OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
             if ( CreateObjectWindow( node->elem, TWC_TRUE) == 0 ) {
                 return 0;
             }
@@ -327,7 +342,7 @@ void SetCurrentObject( RT_OBJECT *obj) /* object */
 }
 
 /**
- * Get parent child list.
+ * Get parent object child list.
  */
 DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj) /* object */
 {
