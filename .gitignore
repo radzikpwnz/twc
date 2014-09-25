@@ -1,2 +1,7 @@
 vs_project/TWC Design.ncb
 *.user
+vs_project/Release/
+property_list/Release/
+copydll.bat
+property_list/proplist.ncb
+vs_project/proplist.dll
