@@ -3,24 +3,27 @@
 #include "common.h"
 
 #include "toolbox.h"
-#include "proplst.h"
-#include "selection.h"
-#include "control_act.h"
 
 #include "control.h"
 
-
-RT_OBJECT *CreateControlFromToolbox( RT_WINDOW *cur_wnd, int x, int y)
+/**
+ * Create control from toolbox.
+ */
+RT_OBJECT *CreateControlFromToolbox( RT_WINDOW *cur_wnd, /* parent window object */
+                                     int x, int y)       /* position */
 {
     RT_OBJECT *obj;
 
-    if ( cur_wnd == NULL ) return NULL;
+    TWC_CHECKIT ( cur_wnd != NULL );
 
+    /* Create object */
     obj = NewObject( GetCurrentToolboxControlId());
 
+    /* Prepare object and load defaults */
     PrepareObject( obj);
     SetNewObjectDefaultValues( obj);
 
+    /* Set object position and size */
     SetObjectPropertyInt( obj, COMMON_X, x, TWC_TRUE, TWC_FALSE);
     SetObjectPropertyInt( obj, COMMON_Y, y, TWC_TRUE, TWC_FALSE);
     SetObjectPropertyInt( obj, COMMON_WIDTH, CONTROL_MIN_WIDTH, TWC_TRUE, TWC_FALSE);
@@ -28,18 +31,23 @@ RT_OBJECT *CreateControlFromToolbox( RT_WINDOW *cur_wnd, int x, int y)
 
     obj->parent = cur_wnd;
 
+    /* Create object window */
     if ( CreateObjectWindow( obj, TWC_FALSE) == 0 )
     {
         FreeObject( obj);
         return NULL;
     }
 
+    /* Add object to parent's child list */
     obj->lstnode_ptr = DListAdd( &cur_wnd->child_list, (void *)-1, &obj);
     GenerateObjectName( obj);
 
     return obj;
 }
 
+/**
+ * Control window procedure.
+ */
 LRESULT CALLBACK ControlWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     RT_OBJECT *obj;
