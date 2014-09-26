@@ -9,10 +9,18 @@
 
 #include "il.h"
 
-//Control string names
-//Order must match control id's order declared in "object.h"
+
+#define TWCIL_HEADER T("TWCIL 1.0\n\n")
+
+#define COMMENT '#'
+#define	WHITESPACE T("\n\r \t")
+
+/**
+ * Control string names
+ * Order must match control id's order declared in "object.h"
+ */
 TCHAR *control_strings[] = {
-    T("WINDOW"), //not used
+    T("WINDOW"), /* not used */
 	T("BUTTON"),
 	T("CHECKBOX"),
 	T("RADIOBUTTON"),
@@ -31,43 +39,42 @@ TCHAR *control_strings[] = {
 	T("TOOLBAR")
 };
 
-//Parse error codes
+/* Parse error codes */
 typedef enum tagERR_CODE {
-	ERR_SUCCESS,
-	ERR_LEXICAL,
-	ERR_SYNTAX
+	ERR_SUCCESS, /* success */
+	ERR_LEXICAL, /* lexical error */
+	ERR_SYNTAX   /* syntax error */
 } ERR_CODE;
 
-//Lexem id's
+/* Lexeme id's */
 typedef enum tagLEX_ID {
-	LEX_INVALID,
-	LEX_WINDOW,
-	LEX_CONTROL,
-	LEX_PROPID,
-	LEX_INTVAL,
-	LEX_STRVAL,
-	LEX_FLOATVAL,
-	LEX_END,
-	LEX_ENDSTREAM
+	LEX_INVALID,  /* invalid lexeme */
+	LEX_WINDOW,   /* window */
+	LEX_CONTROL,  /* control */
+	LEX_PROPID,   /* property ID*/
+	LEX_INTVAL,   /* integer value */
+	LEX_STRVAL,   /* string value */
+	LEX_FLOATVAL, /* float value */
+	LEX_END,      /* end of object */
+	LEX_ENDSTREAM /* end of stream */
 } LEX_ID;
 
+/* Lexeme */
 typedef struct tagLEX {
 	LEX_ID id;
 	VALUE val;
 } LEX, *PLEX;
 
-#define COMMENT '#'
-#define	WHITESPACE T("\n\r \t")
 
-//DLIST(LEX) lex_lst = {NULL, sizeof(LEX)};
+static TCHAR *filebuf;
+static TCHAR *cur_ptr;
+static UINT cur_obj_id;
+static ERR_CODE parse_err;
 
-TWCD_PROJECT *project;
-TCHAR *filebuf;
-TCHAR *cur_ptr;
-UINT cur_obj_id;
-ERR_CODE parse_err;
-
-static LEX_ID GetLex(LEX *lex)
+/**
+ * Get lexeme from input stream.
+ */
+static LEX_ID GetLex( LEX *lex) /* (out) lexeme */
 {
 	TCHAR *p, *p1;
 	TCHAR **pp;
@@ -78,16 +85,17 @@ static LEX_ID GetLex(LEX *lex)
 	p = cur_ptr;
 	lex->id = LEX_INVALID;
 
-	while (*p == COMMENT) { //skip comments
+    /* Skip comments */
+	while ( *p == COMMENT ) {
 		p++;
-		while (*p++ != '\n' ) {
-			if (*p == '\0') break;
+		while ( *p++ != '\n' ) {
+			if ( *p == '\0' ) break;
 		}
 		p += _tcsspn(p, WHITESPACE);
 	}
-	
+
 	len = _tcscspn(p, WHITESPACE);
-	if (len == 0)  {
+	if ( len == 0 )  {
 		cur_ptr = p;
 		lex->id = LEX_ENDSTREAM;
 		goto ret;
@@ -134,7 +142,7 @@ static LEX_ID GetLex(LEX *lex)
 			/*if (len == 0) {
 				lex->val.s = NULL;
 			} else {*/
-		    lex->val.s = malloc((len + 1) * sizeof(TCHAR));
+            lex->val.s = malloc((len + 1) * sizeof(TCHAR));
 			_tcsncpy(lex->val.s, p, len);
 			*((TCHAR *)lex->val.s + len) = '\0';
 			//}
@@ -164,55 +172,62 @@ static LEX_ID GetLex(LEX *lex)
 	}
 
 	cur_ptr = p;
+
 ret:
-	//if (lex->id != LEX_INVALID) {
-		//DListAdd(&lex_lst, prev_elem, &lex);
-	//}
 	return lex->id;
 }
 
-static int ParsePropertyVal( RT_OBJECT *obj, UINT prop_id)
+/**
+ * Parse property value.
+ */
+static int ParsePropertyVal( RT_OBJECT *obj, /* object */
+                             UINT prop_id)   /* property ID */
 {
 	LEX lex;
 	PROPERTY_INFO *propinfo;
 
-	GetLex(&lex);
-	if (lex.id != LEX_STRVAL && lex.id != LEX_INTVAL) {
-		parse_err = (lex.id == LEX_INVALID) ? ERR_LEXICAL : ERR_SYNTAX;
-		goto err;
+    /* Get lexeme and check type */
+	GetLex( &lex);
+	if ( lex.id != LEX_STRVAL && lex.id != LEX_INTVAL ) {
+		parse_err = ( lex.id == LEX_INVALID ) ? ERR_LEXICAL : ERR_SYNTAX;
+		return 0;
 	}
 
+    /* Compare property type and value type */
 	propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
 	if ( lex.id == LEX_STRVAL && propinfo->type != T_STR
-         || lex.id == LEX_INTVAL && (propinfo->type != T_INT && propinfo->type != T_LIST && propinfo->type != T_BOOL)) {
+         || lex.id == LEX_INTVAL && (propinfo->type != T_INT && propinfo->type != T_LIST && propinfo->type != T_BOOL) ) {
 		parse_err = ERR_SYNTAX;
-		goto err;
+		return 0;
 	}
-	
+
+    /* Set property */
     SetObjectProperty( obj, prop_id, &lex.val, TWC_TRUE, TWC_FALSE);
 
 	return 1;
-err:
-	return 0;
 }
 
-static int ParseObject(RT_OBJECT *parent)
+/**
+ * Parse object.
+ */
+static int ParseObject( RT_OBJECT *parent) /* parent object */
 {
     LEX lex;
     RT_OBJECT *obj;
 
+    /* Create and prepare object */
     obj = NewObject( cur_obj_id);
     PrepareObject( obj);
     obj->parent = parent;
 
     while (1) {
-        switch (GetLex(&lex)) {
+        switch ( GetLex( &lex) ) {
             case LEX_PROPID:
-                if (ParsePropertyVal( obj, lex.val.i) == 0) goto err;
+                if ( ParsePropertyVal( obj, lex.val.i) == 0 ) goto err;
                 break;
             case LEX_CONTROL:
             case LEX_WINDOW:
-                if (ParseObject(obj) == 0) goto err;
+                if ( ParseObject( obj) == 0 ) goto err;
                 break;
             case LEX_INVALID:
                 parse_err = ERR_LEXICAL;
@@ -221,92 +236,113 @@ static int ParseObject(RT_OBJECT *parent)
                 obj->lstnode_ptr = DListAdd( GetParentChildList( obj), (void *)-1, &obj);
                 return 1;
             default:
-	            parse_err = ERR_SYNTAX;
-	            return 0;
+                parse_err = ERR_SYNTAX;
+                return 0;
         }
     }
 
 err:
-	free(obj);
+	free( obj);
 	return 0;
 }
 
-static int Parse(TCHAR *str)
+/**
+ * Parse buffer.
+ */
+static int Parse( TCHAR *buf) /* buffer */
 {
 	LEX lex;
 
-	cur_ptr = str;
+	cur_ptr = buf;
 	parse_err = ERR_SUCCESS;
-	while (*cur_ptr != '\0') {
-		if (GetLex(&lex) != LEX_WINDOW) {
-			if (lex.id != LEX_ENDSTREAM) {
-				parse_err = (lex.id == LEX_INVALID) ? ERR_LEXICAL : ERR_SYNTAX;
+	while ( *cur_ptr != '\0' ) {
+        /* Buffer must contain window or be empty */
+		if ( GetLex( &lex) != LEX_WINDOW ) {
+			if ( lex.id != LEX_ENDSTREAM ) {
+				parse_err = ( lex.id == LEX_INVALID ) ? ERR_LEXICAL : ERR_SYNTAX;
 				break;
 			}
 		} else {
-			if (ParseObject(NULL) == 0) break;
+			if ( ParseObject(NULL) == 0 ) break;
 		}
 	}
 
-	return (parse_err == ERR_SUCCESS);
+	return ( parse_err == ERR_SUCCESS );
 }
 
-static int LoadFile(TCHAR *path, void *buf)
+/**
+ * Load file to buffer.
+ */
+static int LoadFile( TCHAR *path, /* file path */
+                     void *buf)   /* buffer */
 {
 	FILE *fd;
 	int filelen;
 	int ret;
 
-	fd = _tfopen(path, T("rb"));
-	if (!fd) return 0;
+    /* Open file */
+	fd = _tfopen( path, T("rb"));
+	if ( !fd ) return 0;
 
+    /* Calculate length */
 	fseek(fd, 0, SEEK_END);
 	filelen = ftell(fd);
 	fseek(fd, 0, SEEK_SET);
 
-	filebuf = malloc(filelen + sizeof(TCHAR));
-	if (!filebuf) goto err;
+    /* Alloc memory */
+	filebuf = malloc( filelen + sizeof(TCHAR));
+	if ( !filebuf ) goto err;
 
-	ret = fread(filebuf, filelen, 1, fd);
-	if (ret != 1) goto err;
+    /* Read file */
+	ret = fread( filebuf, filelen, 1, fd);
+	if ( ret != 1 ) goto err;
 
 	*(TCHAR *)((char *)filebuf + filelen) = '\0';
 
-	fclose(fd);
+	fclose( fd);
 	return 1;
+
 err:
-	fclose(fd);
-	if (filebuf) free(filebuf);
+	fclose( fd);
+	if ( filebuf ) free( filebuf);
 	return 0;
 }
 
-int LoadProjectFromFile(TCHAR *path, TWCD_PROJECT *_project, int *err_pos)
+/**
+ * Load project from file.
+ */
+int LoadProjectFromFile( TCHAR *path,           /* file path */
+                         TWCD_PROJECT *project, /* (out) project */
+                         int *err_pos)          /* (out) error position */
 {
 	int ret;
 	TCHAR *p;
 	int a = sizeof(RT_OBJECT);
 
-	project = _project;
-	if (err_pos) *err_pos = 0;
-	ret = LoadFile(path, filebuf);
-	if (!ret) return 0;
+    /* Read file */
+	if ( err_pos ) *err_pos = 0;
+	ret = LoadFile( path, filebuf);
+	if ( !ret ) return 0;
 
+    /* Compare signature */
 	p = filebuf;
-	if (_tcsncmp(p, T("TWCIL "), 6) != 0) {
+	if ( _tcsncmp( p, T("TWCIL "), 6) != 0 ) {
 		goto err;
 	}
 
+    /* Get TWCIL version */
 	p += 6;
-	project->version.maj = _ttoi(p);
-	while (*p++ != '.');
-	project->version.min = _ttoi(p);
-	while (*p++ != '\n');
+	project->version.maj = _ttoi( p);
+	while ( *p++ != '.' );
+	project->version.min = _ttoi( p);
+	while ( *p++ != '\n' );
 
-	cur_ptr = p + _tcsspn(p, WHITESPACE);
-	if (Parse(cur_ptr) == 0) {
-		switch (parse_err) {
+    /* Parse file */
+	cur_ptr = p + _tcsspn( p, WHITESPACE);
+	if ( Parse(cur_ptr) == 0 ) {
+		switch ( parse_err ) {
 			case ERR_LEXICAL:
-				if (err_pos) *err_pos = cur_ptr - filebuf;
+				if ( err_pos ) *err_pos = cur_ptr - filebuf;
 				break;
 			case ERR_SYNTAX:
 				//if (err_pos) *err_pos = 0;
@@ -315,9 +351,10 @@ int LoadProjectFromFile(TCHAR *path, TWCD_PROJECT *_project, int *err_pos)
 		goto err;
 	}
 
-	project->path = malloc((_tcslen(path) + 1) * sizeof(TCHAR));
-	_tcscpy(project->path, path);
-	free(filebuf);
+    /* Copy file path to project and free buffer */
+	project->path = malloc( (_tcslen( path) + 1) * sizeof(TCHAR));
+	_tcscpy( project->path, path);
+	free( filebuf);
 	return 1;
 
 err:
@@ -325,7 +362,11 @@ err:
 	return 0;
 }
 
-int WriteObjectInfo(FILE *fd, RT_OBJECT *obj)
+/**
+ * Write object info to file.
+ */
+int WriteObjectInfo( FILE *fd,       /* file descriptor */
+                     RT_OBJECT *obj) /* object */
 {
 	DLIST_NODE_PRT_OBJECT *cur_obj_node;
 	static int depth;
@@ -335,7 +376,7 @@ int WriteObjectInfo(FILE *fd, RT_OBJECT *obj)
 	PROPERTY_INFO *propinfo;
 	VALUE *val;
     UINT prop_id, prop_count, prop_flags;
-	
+
 	cp = buf;
 	for (i = 0; i < depth; i++) {
 		*cp++ = '\t';
@@ -396,14 +437,12 @@ int WriteObjectInfo(FILE *fd, RT_OBJECT *obj)
 		    cp = buf;
         } 
     }
-	
-	(void *)cur_obj_node =  obj->child_list.first;
-	while (cur_obj_node != NULL) {
-		if (WriteObjectInfo(fd, cur_obj_node->elem) == 0) {
+
+    OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
+		if ( WriteObjectInfo( fd, node->elem) == 0 ) {
 			return 0;
 		}
-		cur_obj_node = cur_obj_node->next;
-	}
+    OBJ_LIST_ITERATE_END();
 
 	depth--;
 	cp = buf;
@@ -416,7 +455,7 @@ int WriteObjectInfo(FILE *fd, RT_OBJECT *obj)
 	return 1;
 }
 
-int SaveProjectToFile(TWCD_PROJECT *project, TCHAR *path)
+int SaveProjectToFile( TWCD_PROJECT *project, TCHAR *path)
 {
 	DLIST_NODE_PRT_OBJECT *cur_node;
 	FILE *fd;

@@ -8,12 +8,15 @@
 
 #define MAX_CTRL_MOVE_SPEED 20
 
-
+/* Control move speed */
 static int ctrl_move_speed = 1;
 
-
+/**
+ * Delete selected objects.
+ */
 int DeleteSelectedObjects()
 {
+    /* If current object among selected, set current object to parent */
     if ( current_object != NULL && FindObjectInList( current_object, GetSelectedObjects()) != NULL ) {
         SetCurrentObject( GetSelectedObjects()->first->elem->parent);
     }
@@ -27,12 +30,20 @@ int DeleteSelectedObjects()
     return 1;
 }
 
+/**
+ * Place selected objects to clipboard.
+ */
 int CopySelectedObjects()
 {
     PlaceObjectListToClipboard( GetSelectedObjects());
     return 1;
 }
 
+/**
+ * Move selected objects.
+ *
+ * (new_x, new_y) = (x + dx, y + dy)
+ */
 int MoveSelectedObjects( int dx, int dy)
 {
     OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
@@ -42,7 +53,10 @@ int MoveSelectedObjects( int dx, int dy)
     return 1;
 }
 
-int MoveSelectedObjectsKey( UINT dir)
+/**
+ * Move selected objects using keyboard.
+ */
+int MoveSelectedObjectsKey( UINT dir) /* key pressed */
 {
     switch ( dir ) {
         case VK_DOWN:
@@ -66,6 +80,9 @@ int MoveSelectedObjectsKey( UINT dir)
     return 1;
 }
 
+/**
+ * Stop moving objects using keyboard.
+ */
 int StopMovingObjectsKey()
 {
     ctrl_move_speed = 1;
