@@ -5,7 +5,7 @@
 
 typedef struct tagCODE_WINDOW CODE_WINDOW;
 
-#include "twc_design.h"
+#include "object.h"
 
 struct tagCODE_WINDOW {
 	HWND hwnd;
@@ -16,6 +16,6 @@ struct tagCODE_WINDOW {
 
 
 LRESULT CALLBACK CodeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
-int CreateCodeWindow(RT_WINDOW *window, TCHAR *code);
+int CreateCodeWindow( RT_OBJECT *window, TCHAR *code);
 
 #endif

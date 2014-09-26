@@ -1,10 +1,10 @@
-#include <windows.h>
 #include <stdio.h>
 
-#include "twc_design.h"
-
+#include "object.h"
 #include "properties.h"
-#include "stuff.h"
+
+#include "project.h"
+#include "win_stuff.h"
 
 /* Code (.c) and header (.h) files headers */
 #define CODE_START T( "#include <windows.h>\n" ) \

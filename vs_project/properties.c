@@ -3,7 +3,9 @@
 #include <windows.h>
 
 #include "twc_design.h"
+
 #include "proplst.h"
+#include "project.h"
 
 #include "properties.h"
 

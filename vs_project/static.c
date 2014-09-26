@@ -2,6 +2,7 @@
 
 #include "twc_design.h"
 
+#include "control.h"
 #include "selection.h"
 #include "toolbox.h"
 #include "control_act.h"

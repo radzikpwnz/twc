@@ -1,9 +1,11 @@
-#include <windows.h>
-
 #include "twc_design.h"
+
+#include "clipboard.h"
+
 
 /* Clipboard contents */
 static DLIST_PRT_OBJECT clipboard_content = {NULL, NULL, sizeof(RT_OBJECT *)};
+
 
 /**
  * Get clipboard contents.

@@ -1,12 +1,19 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "twc_design.h"
+#include <windows.h>
+
+#include "object.h"
+
+/* Control minimal height and width */
+#define CONTROL_MIN_WIDTH 10
+#define CONTROL_MIN_HEIGHT 10
+
 
 /**
  * Create control from toolbox.
  */
-RT_OBJECT *CreateControlFromToolbox(RT_WINDOW *cur_wnd, int x, int y);
+RT_OBJECT *CreateControlFromToolbox( RT_OBJECT *cur_wnd, int x, int y);
 
 /**
  * Control window procedure.

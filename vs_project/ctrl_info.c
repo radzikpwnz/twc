@@ -1,6 +1,3 @@
-#include <windows.h>
-#include <tchar.h>
-
 #include "twc_design.h"
 
 #include "ctrl_info.h"

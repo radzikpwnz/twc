@@ -9,7 +9,7 @@
 /**
  * Create control from toolbox.
  */
-RT_OBJECT *CreateControlFromToolbox( RT_WINDOW *cur_wnd, /* parent window object */
+RT_OBJECT *CreateControlFromToolbox( RT_OBJECT *cur_wnd, /* parent window object */
                                      int x, int y)       /* position */
 {
     RT_OBJECT *obj;

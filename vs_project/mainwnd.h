@@ -3,9 +3,7 @@
 
 #include <windows.h>
 
-#include "twc_design.h"
-
-LRESULT CALLBACK MainWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK MainWndProc( HWND, UINT, WPARAM, LPARAM);
 
 void actGenerateCode();
 void actNewProject();

@@ -7,7 +7,7 @@
 #include "codegen.h"
 #include "window.h"
 #include "object.h"
-#include "stuff.h"
+#include "win_stuff.h"
 #include "interface.h"
 #include "toolbox.h"
 #include "..\property_list\proplist.h"

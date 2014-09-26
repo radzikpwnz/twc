@@ -4,5 +4,5 @@
 
 #include "il.h"
 #include "window.h"
-#include "stuff.h"
+#include "win_stuff.h"
 #include "interface.h"

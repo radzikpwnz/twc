@@ -2,19 +2,16 @@
 
 #include "twc_design.h"
 
-#include "properties.h"
 #include "interface.h"
 #include "..\property_list\proplist.h"
 #include "proplst.h"
 #include "mainwnd.h"
 #include "toolbox.h"
-#include "control.h"
 #include "selection.h"
 #include "control_act.h"
 #include "clipboard.h"
 #include "static.h"
-
-#include "window.h"
+#include "project.h"
 
 
 static int DeleteWindow( RT_OBJECT *obj)

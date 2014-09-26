@@ -11,7 +11,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 
 #include "twc_design.h"
 
-#include "stuff.h"
+#include "win_stuff.h"
 #include "resource.h"
 #include "twc.h"
 #include "interface.h"

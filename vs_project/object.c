@@ -9,6 +9,7 @@
 #include "interface.h"
 #include "window.h"
 #include "static.h"
+#include "project.h"
 
 #include "object.h"
 
@@ -339,12 +340,4 @@ void SetCurrentObject( RT_OBJECT *obj) /* object */
         LoadPropertyList( hPropList, current_object);
     }
     return;
-}
-
-/**
- * Get parent object child list.
- */
-DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj) /* object */
-{
-    return ( obj->parent == NULL ) ? &cur_project.obj_list : &obj->parent->child_list;
 }

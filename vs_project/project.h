@@ -15,7 +15,13 @@ typedef struct tagTWCD_PROJECT {
 /* Current project info */
 extern TWCD_PROJECT cur_project;
 
+/**
+ * Get parent object child list.
+ */
+DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj);
+
 int LoadCurrentProject();
+
 void UnloadCurrentProject();
 
 #endif

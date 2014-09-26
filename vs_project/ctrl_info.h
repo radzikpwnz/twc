@@ -3,10 +3,6 @@
 
 #include <windows.h>
 
-#include "twc_design.h"
-
-#include "object.h"
-
 //////////////////
 // Control list //
 //////////////////

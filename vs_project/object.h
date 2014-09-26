@@ -1,13 +1,17 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include <windows.h>
+
+#include "mylist.h"
+
 typedef struct tagRT_OBJECT RT_OBJECT, *PRT_OBJECT;
-DLIST_CUSTOM(PRT_OBJECT);
+DLIST_CUSTOM( PRT_OBJECT);
 #define RT_CONTROL RT_OBJECT
 #define RT_WINDOW RT_OBJECT
 
-#include "code_window.h"
 #include "properties.h"
+#include "code_window.h"
 
 /**
  * Object flags
@@ -102,11 +106,6 @@ int DestroyObjectWindow( RT_OBJECT *obj, TWC_BOOL free_obj);
  * Set current object and load it's properties to property list.
  */
 void SetCurrentObject( RT_OBJECT *obj);
-
-/**
- * Get parent object child list.
- */
-DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj);
 
 
 /**

@@ -1,13 +1,11 @@
 #ifndef PROPERTIES_H
 #define PROPERTIES_H
 
-#include <windows.h>
-
 typedef struct tagPROPERTY PROPERTY;
-DLIST_CUSTOM_FD(PROPERTY);
+DLIST_CUSTOM_FD( PROPERTY);
 
 #include "twc_design.h"
-
+#include "object.h"
 #include "ctrl_info.h"
 
 /* Property flags */
@@ -31,10 +29,10 @@ enum tagPROPFILTER_CODE {
 } PROPFILTER_CODE;
 
 
-DLIST_CUSTOM_RD(PROPERTY);
+DLIST_CUSTOM_RD( PROPERTY);
 
-int GenerateObjectName(RT_OBJECT *obj);
-int StyleFilter(RT_OBJECT *obj);
+int GenerateObjectName( RT_OBJECT *obj);
+int StyleFilter( RT_OBJECT *obj);
 
 int ApplyObjectProperty( RT_OBJECT *obj, UINT on_apply_act);
 

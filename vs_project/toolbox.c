@@ -2,9 +2,12 @@
 
 #include "twc_design.h"
 
+#include "win_stuff.h"
+
 #include "resource.h"
 
 #include "toolbox.h"
+
 
 #define TB_FIRST_MESSAGE_CODE	(WM_APP)
 

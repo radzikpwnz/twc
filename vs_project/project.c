@@ -8,6 +8,16 @@
 TWCD_PROJECT cur_project = {{0, 0}, {NULL, NULL, sizeof(RT_CONTROL *)}, NULL};
 
 /**
+ * Get parent object child list.
+ *
+ * TODO: Make root object!!!!
+ */
+DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj) /* object */
+{
+    return ( obj->parent == NULL ) ? &cur_project.obj_list : &obj->parent->child_list;
+}
+
+/**
  * Unload current project.
  *
  * All windows are destroyed and objects freed.

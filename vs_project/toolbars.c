@@ -4,8 +4,10 @@
 
 #include "mainwnd.h"
 #include "window.h"
-#include "resource.h"
 #include "selection.h"
+#include "win_stuff.h"
+
+#include "resource.h"
 
 #include "toolbars.h"
 

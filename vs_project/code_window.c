@@ -3,12 +3,10 @@
 
 #include "twc_design.h"
 
-//#include "properties.h"
 #include "interface.h"
 //#include "..\property_list\proplist.h"
 //#include "proplst.h"
 #include "mainwnd.h"
-
 #include "code_window.h"
 
 typedef struct tagCONTROL_EVENT_INFO CONTROL_EVENT_INFO;

@@ -1,7 +1,7 @@
 #ifndef SELECTION_H
 #define SELECTION_H
 
-#include "twc_design.h"
+#include "object.h"
 
 RECT *GetSelectionFrameRect();
 DLIST_PRT_OBJECT *GetSelectedObjects();

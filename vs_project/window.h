@@ -3,11 +3,11 @@
 
 #include <windows.h>
 
-#include "twc_design.h"
+#include "object.h"
 
-LRESULT CALLBACK ChildWndProc(HWND, UINT, WPARAM, LPARAM);
+LRESULT CALLBACK ChildWndProc( HWND, UINT, WPARAM, LPARAM);
 
 HWND AddWindow();
-int PreviewWindow(RT_OBJECT *obj, HWND hParent);
+int PreviewWindow( RT_OBJECT *obj, HWND hParent);
 
 #endif

@@ -1,6 +1,8 @@
 #ifndef CLIPBOARD_H
 #define CLIPBOARD_H
 
+#include "object.h"
+
 DLIST_PRT_OBJECT *GetCurrentClipboard();
 int ClearClipboard();
 

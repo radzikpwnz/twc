@@ -1,9 +1,7 @@
 #ifndef CODEGEN_H
 #define CODEGEN_H
 
-#include <windows.h>
-
-#include "twc_design.h"
+#include "project.h"
 
 int GenerateProjectCode( TWCD_PROJECT *project);
 

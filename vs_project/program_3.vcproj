@@ -262,10 +262,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stuff.c"
-				>
-			</File>
-			<File
 				RelativePath=".\toolbars.c"
 				>
 			</File>
@@ -283,6 +279,10 @@
 			</File>
 			<File
 				RelativePath=".\twc_design.c"
+				>
+			</File>
+			<File
+				RelativePath=".\win_stuff.c"
 				>
 			</File>
 			<File
@@ -364,10 +364,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\stuff.h"
-				>
-			</File>
-			<File
 				RelativePath=".\toolbars.h"
 				>
 			</File>
@@ -385,6 +381,10 @@
 			</File>
 			<File
 				RelativePath=".\twc_design.h"
+				>
+			</File>
+			<File
+				RelativePath=".\win_stuff.h"
 				>
 			</File>
 			<File
