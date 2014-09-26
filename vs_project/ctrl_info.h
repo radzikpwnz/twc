@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 #include "object.h"
 

@@ -1,6 +1,6 @@
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 /* Clipboard contents */
 static DLIST_PRT_OBJECT clipboard_content = {NULL, NULL, sizeof(RT_OBJECT *)};

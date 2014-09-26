@@ -1,7 +1,7 @@
 #ifndef CONTROL_ACT_H
 #define CONTROL_ACT_H
 
-#include "common.h"
+#include "twc_design.h"
 
 int DeleteSelectedObjects();
 int CopySelectedObjects();

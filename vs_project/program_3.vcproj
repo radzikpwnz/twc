@@ -202,10 +202,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\common.c"
-				>
-			</File>
-			<File
 				RelativePath=".\control.c"
 				>
 			</File>
@@ -286,6 +282,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\twc_design.c"
+				>
+			</File>
+			<File
 				RelativePath=".\window.c"
 				>
 			</File>
@@ -305,10 +305,6 @@
 			</File>
 			<File
 				RelativePath=".\codegen.h"
-				>
-			</File>
-			<File
-				RelativePath=".\common.h"
 				>
 			</File>
 			<File
@@ -385,6 +381,10 @@
 			</File>
 			<File
 				RelativePath=".\twc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\twc_design.h"
 				>
 			</File>
 			<File

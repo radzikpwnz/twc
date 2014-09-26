@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 #include "..\property_list\proplist.h"
 #include "proplst.h"

@@ -1,7 +1,7 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
-#include "common.h"
+#include "twc_design.h"
 
 /**
  * Create control from toolbox.

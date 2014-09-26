@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 int GenerateProjectCode( TWCD_PROJECT *project);
 

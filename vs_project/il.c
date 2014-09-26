@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <tchar.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 #include "properties.h"
 #include "mylist.h"
@@ -358,7 +358,7 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
 	return 1;
 
 err:
-	free(filebuf);
+	free( filebuf);
 	return 0;
 }
 
@@ -368,37 +368,36 @@ err:
 int WriteObjectInfo( FILE *fd,       /* file descriptor */
                      RT_OBJECT *obj) /* object */
 {
-	DLIST_NODE_PRT_OBJECT *cur_obj_node;
 	static int depth;
 	int i;
 	TCHAR buf[256];
-	TCHAR *cp;
+	TCHAR *p;
 	PROPERTY_INFO *propinfo;
 	VALUE *val;
     UINT prop_id, prop_count, prop_flags;
 
-	cp = buf;
-	for (i = 0; i < depth; i++) {
-		*cp++ = '\t';
+	p = buf;
+	for ( i = 0; i < depth; i++ ) {
+		*p++ = '\t';
 	}
-	if (obj->ctrl_id == CTRL_ID_WINDOW) {
-		_tcscpy(cp, T("WND {\n"));
-		cp += 6;
+	if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
+		_tcscpy( p, T("WND {\n"));
+		p += 6;
 	} else {
-		_tcscpy(cp,T("CTRL "));
-		cp += 5;
-		_tcscpy(cp, control_strings[obj->ctrl_id]);
-		cp += _tcslen(control_strings[obj->ctrl_id]);
-		_tcscpy(cp, T(" {\n"));
-		cp += 3;
+		_tcscpy( p,T("CTRL "));
+		p += 5;
+		_tcscpy( p, control_strings[obj->ctrl_id]);
+		p += _tcslen( control_strings[obj->ctrl_id]);
+		_tcscpy( p, T(" {\n"));
+		p += 3;
 	}
 
 	depth++;
 
-	*cp = '\0';
-	_ftprintf(fd, T("%s"), buf);
+	*p = '\0';
+	_ftprintf( fd, T("%s"), buf);
 
-	cp = buf;
+	p = buf;
 
     prop_count = GetControlPropertiesCount( obj->ctrl_id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
@@ -408,33 +407,33 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
             val = GetObjectPropertyVal( obj, prop_id);
 
             for ( i = 0; i < depth; i++ ) {
-			    *cp++ = '\t';
+			    *p++ = '\t';
 		    }
 
-            _tcscpy( cp, propinfo->name);
-		    cp += _tcslen( propinfo->name);
-		    *cp++ = '=';
+            _tcscpy( p, propinfo->name);
+		    p += _tcslen( propinfo->name);
+		    *p++ = '=';
     		
 		    switch ( propinfo->type ) {
 			    case T_INT:
 			    case T_LIST:
 			    case T_BOOL:
-				    _itot( val->i, cp, 10);
-				    cp += _tcslen( cp);
-				    *cp++ = '\n';
-				    fwrite( buf, (cp - buf) * sizeof(TCHAR), 1, fd);
+				    _itot( val->i, p, 10);
+				    p += _tcslen( p);
+				    *p++ = '\n';
+				    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
 				    break;
 			    case T_STR:
-				    *cp++ = '"';
-				    fwrite( buf, (cp - buf) * sizeof(TCHAR), 1, fd);
+				    *p++ = '"';
+				    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
                     if ( val->s ) {
                         fwrite( val->s, _tcslen( val->s) * sizeof(TCHAR), 1, fd);
                     }
-				    _fputtc('"', fd);
-				    _fputtc('\n', fd);
+				    _fputtc( '"', fd);
+				    _fputtc( '\n', fd);
 				    break;
 		    }
-		    cp = buf;
+		    p = buf;
         } 
     }
 
@@ -445,40 +444,44 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
     OBJ_LIST_ITERATE_END();
 
 	depth--;
-	cp = buf;
-	for (i = 0; i < depth; i++) {
-		*cp++ = '\t';
+	p = buf;
+	for ( i = 0; i < depth; i++ ) {
+		*p++ = '\t';
 	}
-	*cp++ = '}';
-	*cp++ = '\n';
-	fwrite(buf, (cp - buf) * sizeof(TCHAR), 1, fd);
+	*p++ = '}';
+	*p++ = '\n';
+	fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
 	return 1;
 }
 
 int SaveProjectToFile( TWCD_PROJECT *project, TCHAR *path)
 {
-	DLIST_NODE_PRT_OBJECT *cur_node;
 	FILE *fd;
 	TCHAR *buf;
 
-	if (path == NULL) path = project->path;
-	fd = _tfopen(path, T("wb, ccs=UNICODE"));
-	if (!fd) return 0;
+    if ( path == NULL ) {
+        path = project->path;
+    }
+	fd = _tfopen( path, T("wb, ccs=UNICODE"));
+    if ( !fd ) {
+        return 0;
+    }
 
-	(void *)cur_node =  project->obj_list.first;
-	if (cur_node == NULL) goto ret;
-	fwrite(TWCIL_HEADER, _tcslen(TWCIL_HEADER) * sizeof(TCHAR), 1, fd);
-	while (cur_node != NULL) {
-		if (WriteObjectInfo(fd, cur_node->elem) == 0) {
+    if ( project->obj_list.first == NULL ) {
+        goto ret;
+    }
+	fwrite( TWCIL_HEADER, _tcslen( TWCIL_HEADER) * sizeof(TCHAR), 1, fd);
+
+	OBJ_LIST_ITERATE_BEGIN( &project->obj_list);
+		if ( WriteObjectInfo( fd, node->elem) == 0 ) {
 			buf = T("Error writing object");
-			MessageBox(hMainWnd, buf, T("Error"), 0);
-			fclose(fd);
+			MessageBox( hMainWnd, buf, T("Error"), 0);
+			fclose( fd);
 			return 0;
 		}
-		cur_node = cur_node->next;
-	}
+    OBJ_LIST_ITERATE_END();
 	
 ret:
-	fclose(fd);
+	fclose( fd);
 	return 1;
 }

@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <stdio.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 #include "properties.h"
 #include "stuff.h"
@@ -109,14 +109,13 @@ static int MakeStyleStrings( RT_OBJECT *obj,      /* object */
  */
 static int GetObjectNameLen( RT_OBJECT *obj) /* object */
 {
-    int len;
-    RT_OBJECT *ptr;
+    int len = 0;
 
-    len = 0;
     if ( obj->parent != NULL) {
         len += GetObjectNameLen( obj->parent) + 1;
     }
     len += _tcslen( obj->name);
+
     return len;
 }
 
@@ -129,11 +128,11 @@ static TCHAR *PrintObjectName( TCHAR *buf,     /* buffer */
     TCHAR *p;
 
     p = buf;
-    if (obj->parent != NULL) {
-        p = PrintObjectName(p, obj->parent);
+    if ( obj->parent != NULL ) {
+        p = PrintObjectName( p, obj->parent);
         *p++ = '_';
     }
-    p = _mytcscpy(p, obj->name);
+    p = _mytcscpy( p, obj->name);
     return p;
 }
 
@@ -159,8 +158,8 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
     TCHAR *p, *p1;
     TCHAR *styles_str, *exstyles_str;
 
-    if (obj->name == NULL) {
-        MessageBox(hMainWnd, T("One of objects doesn't have name!"), T("Error"), 0);
+    if ( obj->name == NULL ) {
+        MessageBox( hMainWnd, T("One of objects doesn't have name!"), T("Error"), 0);
         return 0;
     }
 
@@ -169,9 +168,9 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
 
     /* Calculate buffer size */
     bufsize = 0;
-    objnamelen = GetObjectNameLen(obj);
+    objnamelen = GetObjectNameLen( obj);
     bufsize += objnamelen;
-    if (obj->child_list.first != NULL) {
+    if ( obj->child_list.first != NULL ) {
         bufsize += objnamelen * 2;
         bufsize += 14 /*2x "_childs"*/ + 11 /* "TWC_OBJECT " */ + 3 /* "*[]" */ + 8 /* " = {\n};\n" */;
         bufsize += 6; // "\tNULL\n"
@@ -179,9 +178,9 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
         bufsize += 4; //"NULL"
     }
     bufsize += 11 /* "TWC_OBJECT " */ + 8 /* " = {\n};\n" */;
-    bufsize += (styles_str != NULL) ? _tcslen(styles_str) + 8 : 1;
-    bufsize += (exstyles_str != NULL) ? _tcslen(exstyles_str) + 8 : 1;
-    bufsize += _tcslen( GetObjectClassnameToWrite( obj)) + ((obj->title) ? _tcslen(obj->title) : 0);
+    bufsize += ( styles_str != NULL) ? _tcslen( styles_str) + 8 : 1;
+    bufsize += ( exstyles_str != NULL) ? _tcslen( exstyles_str) + 8 : 1;
+    bufsize += _tcslen( GetObjectClassnameToWrite( obj)) + (( obj->title ) ? _tcslen( obj->title) : 0);
     bufsize += 7 * 3; // 7x "\t,\n"
     bufsize += 4; // 2x ", "
     bufsize += 4 * 15; //ints
@@ -189,19 +188,19 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
 
     /* Generate code for child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-        if ( GenerateObjectCode(node->elem) == 0 ) {
+        if ( GenerateObjectCode( node->elem) == 0 ) {
             return 0;
         }
         bufsize += objnamelen + 5;
-        bufsize += GetObjectNameLen(node->elem);
+        bufsize += GetObjectNameLen( node->elem);
     OBJ_LIST_ITERATE_END();
 
     /* Allocate buffer */
-    buf = malloc(bufsize * sizeof(TCHAR));
+    buf = malloc( bufsize * sizeof(TCHAR));
     p = buf;
 
     /* Generate child array */
-    if (obj->child_list.first != NULL) {
+    if ( obj->child_list.first != NULL ) {
         p = _mytcscpy(p, T("TWC_OBJECT *"));
         p = PrintObjectName(p, obj);
         p = _mytcscpy(p, T("_childs"));
@@ -209,57 +208,57 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
 
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
             *p++ = '\t'; *p++ = '&';
-            p = PrintObjectName(p, node->elem);
+            p = PrintObjectName( p, node->elem);
             *p++ = ','; *p++ = '\n';
         OBJ_LIST_ITERATE_END();
 
         *p++ = '\t';
-        p = _mytcscpy(p, T("NULL\n};\n\n"));
+        p = _mytcscpy( p, T("NULL\n};\n\n"));
     }
 
     /* Generate code for object */
     p1 = p;
-    p = _mytcscpy(p, T("TWC_OBJECT "));
-    p = PrintObjectName(p, obj);
+    p = _mytcscpy( p, T("TWC_OBJECT "));
+    p = PrintObjectName( p, obj);
 
     /* Write object name to header file */
-    fwrite(T("extern "), 7 * sizeof(TCHAR), 1, fd_header);
-    fwrite(p1, (p - p1) * sizeof(TCHAR), 1, fd_header);
-    fwrite(T(";\n"), 2 * sizeof(TCHAR), 1, fd_header);
+    fwrite( T("extern "), 7 * sizeof(TCHAR), 1, fd_header);
+    fwrite( p1, (p - p1) * sizeof(TCHAR), 1, fd_header);
+    fwrite( T(";\n"), 2 * sizeof(TCHAR), 1, fd_header);
 
     /* Write classname */
-    p = _mytcscpy(p, T(" = {\n\t"));
+    p = _mytcscpy( p, T(" = {\n\t"));
     if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
-        p = _mytcscpy(p, T("TEXT(\""));
-        p = _mytcscpy(p, GetObjectClassnameToWrite( obj));
-        p = _mytcscpy(p, T("\")"));
+        p = _mytcscpy( p, T("TEXT(\""));
+        p = _mytcscpy( p, GetObjectClassnameToWrite( obj));
+        p = _mytcscpy( p, T("\")"));
     } else {
-        p = _mytcscpy(p, GetObjectClassnameToWrite( obj));
+        p = _mytcscpy( p, GetObjectClassnameToWrite( obj));
     }
-    p = _mytcscpy(p, T(",\n\t"));
+    p = _mytcscpy( p, T(",\n\t"));
 
     /* Write position and size */
     if (obj->x == CW_USEDEFAULT) {
-        p = _mytcscpy(p, T("CW_USEDEFAULT, "));
+        p = _mytcscpy( p, T("CW_USEDEFAULT, "));
     } else {
-        _itot(obj->x, p, 10); p += _tcslen(p); *p++ = ','; *p++ = ' ';
+        _itot( obj->x, p, 10); p += _tcslen( p); *p++ = ','; *p++ = ' ';
     }
-    _itot(obj->y, p, 10); p += _tcslen(p); *p++ = ','; *p++ = '\n'; *p++ = '\t';
-    _itot(obj->width, p, 10); p += _tcslen(p); *p++ = ','; *p++ = ' ';
-    _itot(obj->height, p, 10); p += _tcslen(p); *p++ = ','; *p++ = '\n'; *p++ = '\t';
+    _itot( obj->y, p, 10); p += _tcslen( p); *p++ = ','; *p++ = '\n'; *p++ = '\t';
+    _itot( obj->width, p, 10); p += _tcslen( p); *p++ = ','; *p++ = ' ';
+    _itot( obj->height, p, 10); p += _tcslen( p); *p++ = ','; *p++ = '\n'; *p++ = '\t';
 
     /* Write title */
     if ( obj->title ) {
-        p = _mytcscpy(p, T("TEXT(\""));
-        p = _mytcscpy(p, obj->title);
-        p = _mytcscpy(p, T("\"),\n\t"));
+        p = _mytcscpy( p, T("TEXT(\""));
+        p = _mytcscpy (p, obj->title);
+        p = _mytcscpy( p, T("\"),\n\t"));
     } else {
-        p = _mytcscpy(p, T("NULL,\n\t"));
+        p = _mytcscpy( p, T("NULL,\n\t"));
     }
 
     /* Write styles string */
     if ( styles_str ) {
-        p = _mytcscpy(p, styles_str);
+        p = _mytcscpy( p, styles_str);
     } else {
         *p++ = T('0');
     }
@@ -267,7 +266,7 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
 
     /* Write exstyles string */
     if ( exstyles_str ) {
-        p = _mytcscpy(p, exstyles_str);
+        p = _mytcscpy( p, exstyles_str);
     } else {
         *p++ = T('0');
     }
@@ -284,19 +283,19 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
     *p++ = ','; *p++ = '\n'; *p++ = '\t';
 
     /* Print childs array name */
-    if (obj->child_list.first != NULL) {
-        p = PrintObjectName(p, obj);
-        p = _mytcscpy(p, T("_childs\n};\n\n"));
+    if ( obj->child_list.first != NULL ) {
+        p = PrintObjectName( p, obj);
+        p = _mytcscpy( p, T("_childs\n};\n\n"));
     } else {
-        p = _mytcscpy(p, T("NULL\n};\n\n"));
+        p = _mytcscpy( p, T("NULL\n};\n\n"));
     }
 
     /* Write buffer to file */
-    fwrite(buf, (p - buf) * sizeof(TCHAR), 1, fd_code);
+    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd_code);
 
     free(buf);
-    if (styles_str) free(styles_str);
-    if (exstyles_str) free(exstyles_str);
+    if ( styles_str ) free( styles_str);
+    if ( exstyles_str ) free( exstyles_str);
     return 1;
 }
 
@@ -308,11 +307,11 @@ int GenerateProjectCode( TWCD_PROJECT *project) /* project */
     SetCurrentDirToExeFolder();
 
     /* Create files */
-    fd_code = _tfopen(T("code\\interface.c"), T("wb"));
+    fd_code = _tfopen( T("code\\interface.c"), T("wb"));
     if ( !fd_code ) {
         return 0;
     }
-    fd_header = _tfopen(T("code\\interface.h"), T("wb"));
+    fd_header = _tfopen( T("code\\interface.h"), T("wb"));
     if ( !fd_header ) {
         fclose(fd_code);
         return 0;
@@ -320,21 +319,21 @@ int GenerateProjectCode( TWCD_PROJECT *project) /* project */
 
     /* Write BOM if UNICODE */
 #ifdef UNICODE
-    fwrite(&BOM, 2, 1, fd_code);
-    fwrite(&BOM, 2, 1, fd_header);
+    fwrite( &BOM, 2, 1, fd_code);
+    fwrite( &BOM, 2, 1, fd_header);
 #endif
 
     /* Write code and header files headers */
-    fwrite(CODE_START, sizeof(CODE_START) - sizeof(TCHAR), 1, fd_code);
-    fwrite(HEADER_START, sizeof(HEADER_START) - sizeof(TCHAR), 1, fd_header);
+    fwrite( CODE_START, sizeof(CODE_START) - sizeof(TCHAR), 1, fd_code);
+    fwrite( HEADER_START, sizeof(HEADER_START) - sizeof(TCHAR), 1, fd_header);
 
     /* Write objects code */
     OBJ_LIST_ITERATE_BEGIN( &project->obj_list);
-        if ( GenerateObjectCode(node->elem) == 0 ) break;
+        if ( GenerateObjectCode( node->elem) == 0 ) break;
     OBJ_LIST_ITERATE_END();
 
-    fclose(fd_code);
-    fclose(fd_header);
+    fclose( fd_code);
+    fclose( fd_header);
 
     return 1;
 }

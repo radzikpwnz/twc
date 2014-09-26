@@ -1,7 +1,7 @@
 #include <windows.h>
 #include <Richedit.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 //#include "properties.h"
 #include "interface.h"

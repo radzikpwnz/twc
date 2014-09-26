@@ -6,7 +6,9 @@
 typedef struct tagPROPERTY PROPERTY;
 DLIST_CUSTOM_FD(PROPERTY);
 
-#include "common.h"
+#include "twc_design.h"
+
+#include "ctrl_info.h"
 
 /* Property flags */
 enum {
@@ -46,7 +48,7 @@ UINT GetObjectPropertyFlags( RT_OBJECT *obj, int prop_id);
 
 int SetObjectProperty( RT_OBJECT *obj, UINT prop_id, const VALUE *new_val, TWC_BOOL update, TWC_BOOL apply);
 int SetObjectPropertyInt( RT_OBJECT *obj, UINT prop_id, int val, TWC_BOOL update, TWC_BOOL apply);
-int SetObjectPropertyStr( RT_OBJECT *obj, UINT prop_id, TCHAR *val, TWC_BOOL update, TWC_BOOL apply);
+int SetObjectPropertyStr( RT_OBJECT *obj, UINT prop_id, const TCHAR *val, TWC_BOOL update, TWC_BOOL apply);
 
 int SetObjectPropertyDefaultValue( RT_OBJECT *obj, UINT prop_id);
 

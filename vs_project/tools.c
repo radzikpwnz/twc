@@ -1,6 +1,6 @@
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 
 DLIST_NODE_PRT_OBJECT *FindObjectInList( RT_OBJECT *obj, DLIST_PRT_OBJECT *list)

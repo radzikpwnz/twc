@@ -1,6 +1,6 @@
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 #include "properties.h"
 #include "..\property_list\proplist.h"

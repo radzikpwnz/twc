@@ -5,7 +5,7 @@
 
 typedef struct tagCODE_WINDOW CODE_WINDOW;
 
-#include "common.h"
+#include "twc_design.h"
 
 struct tagCODE_WINDOW {
 	HWND hwnd;

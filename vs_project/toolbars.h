@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 int AddMainToolbarButtons( HWND hwnd);
 void MainToolbarProc( UINT tb_id);

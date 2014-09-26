@@ -9,7 +9,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include <windows.h>
 #include <commctrl.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 #include "stuff.h"
 #include "resource.h"
@@ -54,6 +54,8 @@ static int CreatePropList()
 	SetWindowPos( hPropList, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 	SendMessage( hPropList, PL_SETITEMHEIGHT, 20, 0);
 	SendMessage( hPropList, WM_SETFONT, (WPARAM)GetStockObject( DEFAULT_GUI_FONT), 0);
+
+    return 1;
 }
 
 /**

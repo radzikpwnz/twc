@@ -3,7 +3,7 @@
 
 #include <windows.h>
 
-#include "common.h"
+#include "twc_design.h"
 
 int LoadProjectFromFile( TCHAR *path, TWCD_PROJECT *project, int *err_pos);
 int SaveProjectToFile( TWCD_PROJECT *project, TCHAR *path);
