@@ -2,12 +2,16 @@
 
 #include "common.h"
 
-#include "interface.h"
-
 #include "project.h"
 
+/* Current project info */
 TWCD_PROJECT cur_project = {{0, 0}, {NULL, NULL, sizeof(RT_CONTROL *)}, NULL};
 
+/**
+ * Unload current project.
+ *
+ * All windows are destroyed and objects freed.
+ */
 void UnloadCurrentProject()
 {
     SetCurrentObject( NULL);
@@ -25,6 +29,11 @@ void UnloadCurrentProject()
     return;
 }
 
+/**
+ * Load current project.
+ *
+ * Creates windows for all objects in project, with childs.
+ */
 int LoadCurrentProject()
 {
     OBJ_LIST_ITERATE_BEGIN( &cur_project.obj_list);

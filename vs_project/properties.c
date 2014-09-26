@@ -1,17 +1,20 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 
 #include <windows.h>
-#include <tchar.h>
 
 #include "common.h"
 #include "proplst.h"
 
 #include "properties.h"
 
+
+/* Objects name usage count for each object id (used to generate unique name) */
 UINT control_names_usage[CONTROL_COUNT];
 
-
-int GenerateObjectName(RT_OBJECT *obj)
+/**
+ * Generate unique object name.
+ */
+int GenerateObjectName( RT_OBJECT *obj) /* object */
 {
 	VALUE val;
 	TCHAR buf[64];
@@ -19,15 +22,20 @@ int GenerateObjectName(RT_OBJECT *obj)
 	int ok;
     TCHAR *default_name;
 
+    /* Get default object name */
     default_name = GetControlDefaultObjectName( obj->ctrl_id);
 	ok = 0;
+
+    /* Add number after default name until it become unique */
 next:
 	while (!ok) {
-		_stprintf(buf, T("%s%d"), default_name, ++control_names_usage[obj->ctrl_id]);
+		_stprintf( buf, T("%s%d"), default_name, ++control_names_usage[obj->ctrl_id]);
 
         obj_node = GetParentChildList( obj)->first;
 		while (obj_node != NULL) {
-			if (obj_node->elem->name && _tcscmp(obj_node->elem->name, buf) == 0 && obj_node->elem != obj) {
+			if ( obj_node->elem->name
+                 && _tcscmp( obj_node->elem->name, buf) == 0
+                 && obj_node->elem != obj ) {
 				ok = 0;
 				goto next;
 			}
@@ -37,12 +45,16 @@ next:
 		ok = 1;
 	}
 
+    /* Set property */
 	val.s = buf;
-	SetObjectProperty(obj, COMMON_NAME, &val, TWC_TRUE, TWC_TRUE);
+	SetObjectProperty( obj, COMMON_NAME, &val, TWC_TRUE, TWC_TRUE);
 	return 1;
 }
 
-int StyleFilter(RT_OBJECT *obj)
+/**
+ * Style filter, not used for preview.
+ */
+int StyleFilter( RT_OBJECT *obj) /* object */
 {
 	DWORD style;
 
@@ -52,12 +64,13 @@ int StyleFilter(RT_OBJECT *obj)
 	return style;
 }
 
-int ReCreateObject(RT_OBJECT *obj)
+/* Destroy and create object window */
+int ReCreateObject( RT_OBJECT *obj) /* object */
 {
 	HWND insert_after;
     int set_current_obj = 0;
 
-	if (obj->hwnd == 0) return 0;
+	if ( obj->hwnd == 0 ) return 0;
 
 	insert_after = GetNextWindow( obj->hwnd, GW_HWNDPREV);
 
@@ -67,7 +80,11 @@ int ReCreateObject(RT_OBJECT *obj)
 	return 1;
 }
 
-int ApplyObjectProperty( RT_OBJECT *obj, UINT on_apply_act)
+/**
+ * Apply property changes to object.
+ */
+int ApplyObjectProperty( RT_OBJECT *obj,    /* object */
+                         UINT on_apply_act) /* action(s) */
 {
     RECT rect;
 
@@ -77,16 +94,20 @@ int ApplyObjectProperty( RT_OBJECT *obj, UINT on_apply_act)
 
     TWC_CHECKIT( obj->hwnd != NULL );
 
+    /* If recreate object, nothing more to do */
     if ( on_apply_act & PROPERTY_ON_APPLY_RECREATE ) {
         ReCreateObject( obj);
         return 1;
     }
 
+    /* Custom actions */
     if ( on_apply_act & PROPERTY_ON_APPLY_CUSTOM_MASK ) {
         switch ( (on_apply_act & PROPERTY_ON_APPLY_CUSTOM_MASK) >> PROPERTY_ON_APPLY_CUSTOM_SHIFT ) {
+            /* Set position */
             case PROPERTY_ON_APPLY_CUSTOM_SETPOS:
                 SetWindowPos( obj->hwnd, NULL, obj->x, obj->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
                 break;
+            /* Set size */
             case PROPERTY_ON_APPLY_CUSTOM_SETSIZE:
                 rect.left = rect.top = 0;
                 rect.right = obj->width;
@@ -96,6 +117,7 @@ int ApplyObjectProperty( RT_OBJECT *obj, UINT on_apply_act)
                 }
                 SetWindowPos( obj->hwnd, NULL, 0, 0, rect.right - rect.left, rect.bottom - rect.top, SWP_NOMOVE | SWP_NOZORDER);
                 break;
+            /* Set title */
             case PROPERTY_ON_APPLY_CUSTOM_SETTITLE:
                 SetWindowText( obj->hwnd, obj->title);
                 break;
@@ -104,16 +126,19 @@ int ApplyObjectProperty( RT_OBJECT *obj, UINT on_apply_act)
         }
     }
 
+    /* Set style */
     if ( on_apply_act & PROPERTY_ON_APPLY_SETSTYLE ) {
         SetWindowLong(obj->hwnd, GWL_STYLE, StyleFilter(obj));
         SetWindowPos(obj->hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
     }
 
+    /* Set extended style */
     if ( on_apply_act & PROPERTY_ON_APPLY_SETEXSTYLE ) {
         SetWindowLong(obj->hwnd, GWL_EXSTYLE, obj->exstyle);
         SetWindowPos(obj->hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE | SWP_NOZORDER);
     }
 
+    /* Redraw */
     if ( on_apply_act & PROPERTY_ON_APPLY_REDRAW ) {
         InvalidateRect(obj->hwnd, NULL, 0);
         UpdateWindow(obj->hwnd);
@@ -125,12 +150,20 @@ int ApplyObjectProperty( RT_OBJECT *obj, UINT on_apply_act)
 #define UPDATE_STYLE(x) {if (prop->val.i) obj->style |= (x); else obj->style &= ~(x);}
 #define UPDATE_EXSTYLE(x) {if (prop->val.i) obj->exstyle |= (x); else obj->exstyle &= ~(x);}
 
-static int UpdateObjectPropertyInternal( RT_OBJECT *obj, UINT prop_id, BOOL apply)
+/**
+ * Update object property.
+ *
+ * For internal usage.
+ */
+static int UpdateObjectPropertyInternal( RT_OBJECT *obj, /* object */
+                                         UINT prop_id,   /* property ID */
+                                         TWC_BOOL apply) /* apply property? */
 {
     PROP_ON_SET_ACTION *act;
     PROPERTY_INFO *propinfo;
     PROPERTY *prop;
 
+    /* Get property info and property */
     propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
 	act = &(propinfo->on_set_act);
     prop = GetObjectProperty( obj, prop_id);
@@ -138,6 +171,7 @@ static int UpdateObjectPropertyInternal( RT_OBJECT *obj, UINT prop_id, BOOL appl
     obj->style &= ~(act->style_to_remove);
     obj->style &= ~(act->exstyle_to_remove);
 
+    /* Updating style and extended style */
     UPDATE_STYLE( act->style_to_set);
     UPDATE_EXSTYLE( act->exstyle_to_set);
 
@@ -148,10 +182,12 @@ static int UpdateObjectPropertyInternal( RT_OBJECT *obj, UINT prop_id, BOOL appl
         obj->exstyle |= act->exstyle_list_to_set[prop->val.i];
     }
 
+    /* Custom action */
     if ( act->custom_act_func ) {
         act->custom_act_func( obj, prop_id);
     }
 
+    /* Apply property if necessary */
     if ( apply ) {
         ApplyObjectProperty( obj, propinfo->on_apply_act);
     }
@@ -159,7 +195,12 @@ static int UpdateObjectPropertyInternal( RT_OBJECT *obj, UINT prop_id, BOOL appl
 	return 1;
 }
 
-int UpdateObjectProperty( RT_OBJECT *obj, UINT prop_id, BOOL apply)
+/**
+ * Update object property (or all properties).
+ */
+int UpdateObjectProperty( RT_OBJECT *obj, /* object */
+                          UINT prop_id,   /* property ID */
+                          TWC_BOOL apply)     /* apply property? */
 {
     int prop_count;
     int i;
@@ -179,62 +220,64 @@ int UpdateObjectProperty( RT_OBJECT *obj, UINT prop_id, BOOL apply)
 	return 1;
 }
 
-int PropertyFilter( RT_OBJECT *obj, int prop_id, VALUE *val)
+/**
+ * Check if new property value is correct.
+ */
+int PropertyFilter( RT_OBJECT *obj, /* object */
+                    int prop_id,    /* property ID */
+                    VALUE *val)     /* value */
 {
-	DLIST_NODE_PRT_OBJECT *obj_node;
-	//PROPERTY_INFO *propinfo;
-
-	if (prop_id == COMMON_NAME) {
-		(void *)obj_node = (obj->parent == NULL) ? (void *)cur_project.obj_list.first : (void *)obj->parent->child_list.first;
-		while (obj_node != NULL) {
-			if (obj_node->elem->name && _tcscmp(obj_node->elem->name, val->s) == 0 && obj_node->elem != obj) {
-				MessageBox(hMainWnd, T("Control with this name already exists!"), T("Error!"), 0);
+    /* Name check */
+	if ( prop_id == COMMON_NAME ) {
+        OBJ_LIST_ITERATE_BEGIN( GetParentChildList( obj));
+			if ( node->elem->name && _tcscmp( node->elem->name, val->s) == 0 && node->elem != obj ) {
+				MessageBox( hMainWnd, T("Control with this name already exists!"), T("Error!"), 0);
 				return PF_WRONG;
 			}
-			obj_node = obj_node->next;
-		}
+        OBJ_LIST_ITERATE_END();
 	}
 
-	if ((prop_id >= COMMON_PROPERTIES_BEGIN) && (prop_id < COMMON_PROPERTIES_END)) { //Common properties
-		switch (prop_id) {
+	if ( (prop_id >= COMMON_PROPERTIES_BEGIN) && (prop_id < COMMON_PROPERTIES_END) ) {
+        /* Common properties */
+		switch ( prop_id ) {
 			case COMMON_NAME:
-				if (val->s[0] == T('\0')) {
+				if ( val->s[0] == T('\0') ) {
 					return PF_WRONG;
 				}
 				break;
 			case COMMON_WIDTH:
-				if (val->i < 2) {
+				if ( val->i < 2 ) {
 					val->i = 2;
 					return PF_CORRECTED;
 				}
 				break;
 			case COMMON_HEIGHT:
-				if (val->i < 2) {
+				if ( val->i < 2 ) {
 					val->i = 2;
 					return PF_CORRECTED;
 				}
 				break;
 			case COMMON_BORDER:
-				if (obj->ctrl_id == - 1) return PF_WRONG;
-				break;
-			case COMMON_DISABLED:
+				if ( obj->ctrl_id == CTRL_ID_WINDOW ) return PF_WRONG;
 				break;
 			case COMMON_CUSTOMSTYLE:
-				if (val->s[0] == T('\0')) {
+				if ( val->s[0] == T('\0') ) {
 					return PF_DEFAULT;
 				}
 				break;
 		}
-	} else if (obj->ctrl_id == -1) { //Window properties
-		switch (prop_id) {
+	} else if ( obj->ctrl_id == -1 ) {
+        /* Window properties */
+		switch ( prop_id ) {
 			case WINDOW_CLASSNAME:
 				break;
 		}
-	} else { //Control properties
-		switch (obj->ctrl_id) {
+	} else {
+        /* Control properties */
+		switch ( obj->ctrl_id ) {
 			case CTRL_ID_COMBOBOX:
-				if (obj->style & CBS_SIMPLE && obj->style & CBS_DROPDOWN) {
-					switch (prop_id) {
+				if ( obj->style & CBS_SIMPLE && obj->style & CBS_DROPDOWN ) {
+					switch ( prop_id ) {
 						case COMBOBOX_LOWERCASE:
 						case COMBOBOX_UPPERCASE:
 							return PF_WRONG;
@@ -247,7 +290,12 @@ int PropertyFilter( RT_OBJECT *obj, int prop_id, VALUE *val)
 	return PF_OK;
 }
 
-BOOL IsValuesEQ( const VALUE *val1, const VALUE *val2, UINT type)
+/**
+ * Compare to property values.
+ */
+static TWC_BOOL IsValuesEQ( const VALUE *val1, /* value 1 */
+                            const VALUE *val2, /* value 2 */
+                            UINT type)         /* type */
 {
     switch (type) {
 		case T_INT:
@@ -274,7 +322,11 @@ BOOL IsValuesEQ( const VALUE *val1, const VALUE *val2, UINT type)
     return TWC_FALSE;
 }
 
-PROPERTY *GetObjectProperty(RT_OBJECT *obj, UINT prop_id)
+/**
+ * Get object property.
+ */
+PROPERTY *GetObjectProperty( RT_OBJECT *obj, /* object */
+                             UINT prop_id)   /* property ID */
 {
     TWC_CHECKIT( prop_id != PROPERTIES_ALL);
     TWC_CHECKIT( prop_id < GetControlPropertiesCount( obj->ctrl_id) );
@@ -282,17 +334,32 @@ PROPERTY *GetObjectProperty(RT_OBJECT *obj, UINT prop_id)
 	return &obj->properties[prop_id];
 }
 
-VALUE *GetObjectPropertyVal(RT_OBJECT *obj, int prop_id)
+/**
+ * Get object property value.
+ */
+VALUE *GetObjectPropertyVal( RT_OBJECT *obj, /* object */
+                             int prop_id)    /* property ID */
 {
     return &GetObjectProperty(obj, prop_id)->val;
 }
 
-UINT GetObjectPropertyFlags(RT_OBJECT *obj, int prop_id)
+/**
+ * Get object property flags.
+ */
+UINT GetObjectPropertyFlags( RT_OBJECT *obj, /* object */
+                             int prop_id)    /* property ID */
 {
     return GetObjectProperty(obj, prop_id)->flags;
 }
 
-int SetObjectPropertyInt( RT_OBJECT *obj, UINT prop_id, int val, BOOL update, BOOL apply)
+/**
+ * Set object property integer value.
+ */
+int SetObjectPropertyInt( RT_OBJECT *obj, /* object */
+                          UINT prop_id,   /* property ID */
+                          int val,        /* new value */
+                          TWC_BOOL update,    /* update property? */
+                          TWC_BOOL apply)     /* apply property? */
 {
     VALUE value;
 
@@ -300,7 +367,14 @@ int SetObjectPropertyInt( RT_OBJECT *obj, UINT prop_id, int val, BOOL update, BO
     return SetObjectProperty( obj, prop_id, &value, update, apply);
 }
 
-int SetObjectPropertyStr( RT_OBJECT *obj, UINT prop_id, TCHAR *val, BOOL update, BOOL apply)
+/**
+ * Set object property string value.
+ */
+int SetObjectPropertyStr( RT_OBJECT *obj,   /* object */
+                          UINT prop_id,     /* property ID */
+                          const TCHAR *val, /* new value */
+                          TWC_BOOL update,      /* update property? */
+                          TWC_BOOL apply)       /* apply property? */
 {
     VALUE value;
 
@@ -308,7 +382,14 @@ int SetObjectPropertyStr( RT_OBJECT *obj, UINT prop_id, TCHAR *val, BOOL update,
     return SetObjectProperty( obj, prop_id, &value, update, apply);
 }
 
-int SetObjectProperty(RT_OBJECT *obj, UINT prop_id, const VALUE *new_val, BOOL update, BOOL apply)
+/**
+ * Set object property value.
+ */
+int SetObjectProperty( RT_OBJECT *obj,       /* object */
+                       UINT prop_id,         /* property ID */
+                       const VALUE *new_val, /* new value */
+                       TWC_BOOL update,          /* update property? */
+                       TWC_BOOL apply)           /* apply property? */
 {
 	PROPERTY_INFO *propinfo;
 	PROPERTY *prop;
@@ -320,19 +401,19 @@ int SetObjectProperty(RT_OBJECT *obj, UINT prop_id, const VALUE *new_val, BOOL u
 
     prop->flags |= PROPERTY_FLAG_SET;
 
-    //Default value
+    /* Default value check */
 	if ( IsValuesEQ( new_val, &propinfo->default_caption, propinfo->type) ) {
         prop->flags |= PROPERTY_FLAG_DEFAULT;
     } else {
         prop->flags &= ~PROPERTY_FLAG_DEFAULT;
     }
 
-    //Same value
+    /* Same value check */
     if ( IsValuesEQ( new_val, &prop->val, propinfo->type) ) {
         return 1;
     }
 
-    //Set new value
+    /* Set new value */
 	switch (propinfo->type) {
 		case T_INT:
 		case T_LIST:
@@ -344,10 +425,12 @@ int SetObjectProperty(RT_OBJECT *obj, UINT prop_id, const VALUE *new_val, BOOL u
 			break;
 	}
 
+    /* Update property */
     if ( update ) {
         UpdateObjectProperty( obj, prop_id, apply);
     }
 
+    /* If object is current, update property in property list */
     if ( obj == current_object ) {
         TWC_CHECKIT( obj->hwnd != NULL );
         UpdateSingleListProperty( hPropList, obj, prop_id, &(prop->val));
@@ -356,7 +439,11 @@ int SetObjectProperty(RT_OBJECT *obj, UINT prop_id, const VALUE *new_val, BOOL u
 	return 1;
 }
 
-int SetObjectPropertyDefaultValue( RT_OBJECT *obj, UINT prop_id)
+/**
+ * Set default value to property or all properties.
+ */
+int SetObjectPropertyDefaultValue( RT_OBJECT *obj, /* object */
+                                   UINT prop_id)   /* property ID */
 {
     int prop_count;
     int i;

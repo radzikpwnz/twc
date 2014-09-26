@@ -6,6 +6,7 @@
 #include "properties.h"
 #include "stuff.h"
 
+/* Code (.c) and header (.h) files headers */
 #define CODE_START T( "#include <windows.h>\n" ) \
                    T( "#include \"twc.h\"\n" ) \
                    T( "#include \"interface.h\"\n\n" )
@@ -13,13 +14,18 @@
 #define HEADER_START T( "#include <windows.h>\n" ) \
                      T( "#include \"twc.h\"\n\n" )
 
+/* BOM */
 static wchar_t BOM = 0xFEFF;
 
+/* File descriptors of code and header files */
 static FILE *fd_code, *fd_header;
-static TCHAR *current_prefix;
 
-
-static int MakeStyleStrings( RT_OBJECT *obj, TCHAR **style_str, TCHAR **exstyle_str)
+/**
+ * Make style and exnended style strings from properties.
+ */
+static int MakeStyleStrings( RT_OBJECT *obj,      /* object */
+                             TCHAR **style_str,   /* (out) pointer to style string */
+                             TCHAR **exstyle_str) /* (out) pointer to extended style string */
 {
     TCHAR *style_s, *exstyle_s;
     TCHAR *p_s, *p_ex;
@@ -97,21 +103,20 @@ static int MakeStyleStrings( RT_OBJECT *obj, TCHAR **style_str, TCHAR **exstyle_
     return 1;
 }
 
-static int GetObjectNameLen(RT_OBJECT *obj)
+static int GetObjectNameLen( RT_OBJECT *obj)
 {
     int len;
     RT_OBJECT *ptr;
 
     len = 0;
-    ptr = obj->parent;
-    if (ptr != NULL) {
-        len += GetObjectNameLen(ptr) + 1;
+    if ( obj->parent != NULL) {
+        len += GetObjectNameLen( obj->parent) + 1;
     }
-    len += _tcslen(obj->name);
+    len += _tcslen( obj->name);
     return len;
 }
 
-static TCHAR *PrintObjectName(TCHAR *buf, RT_OBJECT *obj)
+static TCHAR *PrintObjectName( TCHAR *buf, RT_OBJECT *obj)
 {
     TCHAR *p;
 
@@ -133,7 +138,7 @@ static const TCHAR *GetObjectClassnameToWrite( RT_OBJECT *obj)
     }
 }
 
-static int GenerateObjectCode(RT_OBJECT *obj)
+static int GenerateObjectCode( RT_OBJECT *obj)
 {
     TCHAR *buf;
     int bufsize, objnamelen;
