@@ -64,10 +64,15 @@ typedef struct tagLEX {
 } LEX, *PLEX;
 
 
-static TCHAR *filebuf;
+/* Current pointer in file buffer */
 static TCHAR *cur_ptr;
+
+/* Current object ID */
 static UINT cur_obj_id;
+
+/* Parse error */
 static ERR_CODE parse_err;
+
 
 /**
  * Get lexeme from input stream.
@@ -271,12 +276,12 @@ static int Parse( TCHAR *buf) /* buffer */
 /**
  * Load file to buffer.
  */
-static int LoadFile( TCHAR *path, /* file path */
-                     void *buf)   /* buffer */
+static TCHAR  *LoadFile( TCHAR *path) /* file path */
 {
 	FILE *fd;
 	int filelen;
 	int ret;
+    TCHAR *buf;
 
     /* Open file */
 	fd = _tfopen( path, T("rb"));
@@ -288,22 +293,22 @@ static int LoadFile( TCHAR *path, /* file path */
 	fseek(fd, 0, SEEK_SET);
 
     /* Alloc memory */
-	filebuf = malloc( filelen + sizeof(TCHAR));
-	if ( !filebuf ) goto err;
+	buf = malloc( filelen + sizeof(TCHAR));
+	if ( !buf ) goto err;
 
     /* Read file */
-	ret = fread( filebuf, filelen, 1, fd);
+	ret = fread( buf, filelen, 1, fd);
 	if ( ret != 1 ) goto err;
 
-	*(TCHAR *)((char *)filebuf + filelen) = '\0';
+	*(TCHAR *)((char *)buf + filelen) = '\0';
 
 	fclose( fd);
-	return 1;
+	return buf;
 
 err:
 	fclose( fd);
-	if ( filebuf ) free( filebuf);
-	return 0;
+	if ( buf ) free( buf);
+	return NULL;
 }
 
 /**
@@ -313,17 +318,19 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
                          TWCD_PROJECT *project, /* (out) project */
                          int *err_pos)          /* (out) error position */
 {
-	int ret;
-	TCHAR *p;
+	TCHAR *buf, *p;
 	int a = sizeof(RT_OBJECT);
 
-    /* Read file */
 	if ( err_pos ) *err_pos = 0;
-	ret = LoadFile( path, filebuf);
-	if ( !ret ) return 0;
+
+    /* Read file */
+	buf = LoadFile( path);
+	if ( buf == NULL ) {
+        return 0;
+    }
 
     /* Compare signature */
-	p = filebuf;
+	p = buf;
 	if ( _tcsncmp( p, T("TWCIL "), 6) != 0 ) {
 		goto err;
 	}
@@ -337,10 +344,10 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
 
     /* Parse file */
 	cur_ptr = p + _tcsspn( p, WHITESPACE);
-	if ( Parse(cur_ptr) == 0 ) {
+	if ( Parse( cur_ptr) == 0 ) {
 		switch ( parse_err ) {
 			case ERR_LEXICAL:
-				if ( err_pos ) *err_pos = cur_ptr - filebuf;
+				if ( err_pos ) *err_pos = cur_ptr - buf;
 				break;
 			case ERR_SYNTAX:
 				//if (err_pos) *err_pos = 0;
@@ -352,7 +359,7 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
     /* Copy file path to project and free buffer */
 	project->path = malloc( (_tcslen( path) + 1) * sizeof(TCHAR));
 	_tcscpy( project->path, path);
-	free( filebuf);
+	free( buf);
 	return 1;
 
 err:
@@ -374,29 +381,29 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
 	VALUE *val;
     UINT prop_id, prop_count, prop_flags;
 
+    /* Write tabs depending on current depth */
 	p = buf;
 	for ( i = 0; i < depth; i++ ) {
-		*p++ = '\t';
-	}
-	if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
-		_tcscpy( p, T("WND {\n"));
-		p += 6;
-	} else {
-		_tcscpy( p,T("CTRL "));
-		p += 5;
-		_tcscpy( p, control_strings[obj->ctrl_id]);
-		p += _tcslen( control_strings[obj->ctrl_id]);
-		_tcscpy( p, T(" {\n"));
-		p += 3;
+		*p++ = T('\t');
 	}
 
+    /* Write CTRL/WND label, control name if CTRL, and { */
+	if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
+		p = _mytcscpy( p, T("WND {\n"));
+	} else {
+		p = _mytcscpy( p, T("CTRL "));
+		p = _mytcscpy( p, control_strings[obj->ctrl_id]);
+		p = _mytcscpy( p, T(" {\n"));
+	}
+
+    /* Flush buffer to disk */
+	_ftprintf( fd, T("%s"), buf);
+    p = buf;
+
+    /* Increase depth */
 	depth++;
 
-	*p = '\0';
-	_ftprintf( fd, T("%s"), buf);
-
-	p = buf;
-
+    /* Write properties */
     prop_count = GetControlPropertiesCount( obj->ctrl_id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         prop_flags = GetObjectPropertyFlags( obj, prop_id);
@@ -404,51 +411,63 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
             propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
             val = GetObjectPropertyVal( obj, prop_id);
 
+            /* Write tabs depending on current depth */
             for ( i = 0; i < depth; i++ ) {
-			    *p++ = '\t';
-		    }
+                *p++ = T('\t');
+            }
 
-            _tcscpy( p, propinfo->name);
-		    p += _tcslen( propinfo->name);
-		    *p++ = '=';
-    		
-		    switch ( propinfo->type ) {
-			    case T_INT:
-			    case T_LIST:
-			    case T_BOOL:
-				    _itot( val->i, p, 10);
-				    p += _tcslen( p);
-				    *p++ = '\n';
-				    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
-				    break;
-			    case T_STR:
-				    *p++ = '"';
-				    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
+            /* Write property name */
+            p = _mytcscpy( p, propinfo->name);
+            *p++ = T('=');
+
+            /* Write property value */
+            switch ( propinfo->type ) {
+                case T_INT:
+                case T_LIST:
+                case T_BOOL:
+                    /* Convert integer to string */
+                    _itot( val->i, p, 10);
+                    p += _tcslen( p);
+                    *p++ = T('\n');
+                    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
+                    break;
+                case T_STR:
+                    *p++ = T('"');
+                    fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
+
+                    /* Write string value to file directly because it could have variable size */
                     if ( val->s ) {
                         fwrite( val->s, _tcslen( val->s) * sizeof(TCHAR), 1, fd);
                     }
-				    _fputtc( '"', fd);
-				    _fputtc( '\n', fd);
-				    break;
-		    }
-		    p = buf;
-        } 
+                    _fputtc( T('"'), fd);
+                    _fputtc( T('\n'), fd);
+                    break;
+            }
+            p = buf;
+        }
     }
 
+    /* Write object childs */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
 		if ( WriteObjectInfo( fd, node->elem) == 0 ) {
 			return 0;
 		}
     OBJ_LIST_ITERATE_END();
 
+    /* Decrease depth */
 	depth--;
+
+    /* Write tabs depending on current depth */
 	p = buf;
 	for ( i = 0; i < depth; i++ ) {
 		*p++ = '\t';
 	}
-	*p++ = '}';
-	*p++ = '\n';
+
+    /* Writing } */
+	*p++ = T('}');
+	*p++ = T('\n');
 	fwrite( buf, (p - buf) * sizeof(TCHAR), 1, fd);
+
 	return 1;
 }
 

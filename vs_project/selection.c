@@ -4,16 +4,28 @@
 
 #include "clipboard.h"
 
-
+/* Selected objects list */
 static DLIST_PRT_OBJECT selected_objects = {NULL, NULL, sizeof(RT_OBJECT *)};
 
+/* Flag indicates that selection is active */
 static TWC_BOOL is_selection_active;
+
+/* Start point of selection */
 static x_start, y_start;
+
+/* Selection frame rect */
 static RECT frame_rect;
+
+/* Parent window object */
 static RT_OBJECT *parent_wnd;
+
+/* Previous selection end in selected objects list */
 static DLIST_NODE_PRT_OBJECT *prev_sel_end;
 
 
+/**
+ * Get selection frame rect.
+ */
 RECT *GetSelectionFrameRect()
 {
     TWC_CHECKIT( is_selection_active );
@@ -21,22 +33,32 @@ RECT *GetSelectionFrameRect()
     return &frame_rect;
 }
 
+/**
+ * Get selected objects.
+ */
 DLIST_PRT_OBJECT *GetSelectedObjects()
 {
     return &selected_objects;
 }
 
+/**
+ * Clear selection.
+ */
 int ClearSelection()
 {
     OBJ_LIST_ITERATE_BEGIN( &selected_objects);
         node->elem->selected = 0;
         RedrawWindow(node->elem->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     OBJ_LIST_ITERATE_END();
+
     DListFree( &selected_objects);
     return 1;
 }
 
-int AddObjectToSelection( RT_OBJECT *obj)
+/**
+ * Add object to selection
+ */
+int AddObjectToSelection( RT_OBJECT *obj) /* object */
 {
     TWC_CHECKIT( !(obj->selected));
 
@@ -45,7 +67,10 @@ int AddObjectToSelection( RT_OBJECT *obj)
     return 1;
 }
 
-int DeleteObjectFromSelection( RT_OBJECT *obj)
+/**
+ * Delete object from selection.
+ */
+int DeleteObjectFromSelection( RT_OBJECT *obj) /* object */
 {
     TWC_CHECKIT( obj->selected);
 
@@ -54,12 +79,20 @@ int DeleteObjectFromSelection( RT_OBJECT *obj)
     return 1;
 }
 
+/**
+ * Returns selection active flag.
+ */
 TWC_BOOL IsSelectionActive()
 {
     return is_selection_active;
 }
 
-int StartSelection( RT_OBJECT *parent, int x, int y, TWC_BOOL new)
+/**
+ * Start selection.
+ */
+int StartSelection( RT_OBJECT *parent, /* parent object */
+                    int x, int y,      /* coordinates of start point*/
+                    TWC_BOOL new)      /* new selection? */
 {
     TWC_CHECKIT( !is_selection_active );
     TWC_CHECKIT( GetCapture() == NULL );
@@ -77,7 +110,10 @@ int StartSelection( RT_OBJECT *parent, int x, int y, TWC_BOOL new)
     return 1;
 }
 
-int ProcessSelectionFrameChange( int new_x, int new_y)
+/**
+ * Process selection frame change.
+ */
+int ProcessSelectionFrameChange( int new_x, int new_y) /* new coordinates */
 {
     RECT update_rect, node_rect, res_rect;
     RT_OBJECT *obj;
@@ -139,6 +175,9 @@ int ProcessSelectionFrameChange( int new_x, int new_y)
     return 1;
 }
 
+/**
+ * Stop selection.
+ */
 void StopSelection()
 {
     TWC_CHECKIT( is_selection_active );
