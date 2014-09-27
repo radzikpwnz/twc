@@ -8,13 +8,6 @@
 
 #define TWC_CHECKERS_ENABLED
 
-/* Checker */
-#ifdef TWC_CHECKERS_ENABLED
-#define TWC_CHECKIT(x) { if ( !(x) ) twc_Fatal( T(__FILE__), __LINE__); }
-#else
-#define TWC_CHECKIT(x)
-#endif
-
 /* Boolean type */
 typedef BOOL TWC_BOOL;
 
@@ -51,10 +44,5 @@ extern RT_OBJECT *current_object;
 extern int grid_size;
 extern int new_control;
 
-
-/**
- * Terminate program and show error message.
- */
-void twc_Fatal( TCHAR *file, int line);
 
 #endif

@@ -1,40 +1,81 @@
-#include "object.h"
+#include "twc_design.h"
 
 #include "interface.h"
 
-#include "tools.h"
 
-
-DLIST_NODE_PRT_OBJECT *FindObjectInList( RT_OBJECT *obj, DLIST_PRT_OBJECT *list)
+/**
+ * Terminate program and show error message.
+ */
+void twc_Fatal( TCHAR *file, int line)
 {
-    DLIST_NODE_PRT_OBJECT *node;
+    TCHAR buf[256];
 
-    node = list->first;
-    while ( node != NULL ) {
+    _stprintf( buf, T("Assertion failed in file \"%s\", line %d. Program will be terminated!"), file, line);
+    MessageBox( hMainWnd, buf, T("Error!"), 0);
+    ExitProcess( 1);
+    return;
+}
+
+/**
+ * Search object in object list.
+ *
+ * Returns:
+ *   pointer to list node containing object, if found
+ *   NULL, otherwise
+ */
+DLIST_NODE_PRT_OBJECT *FindObjectInList( RT_OBJECT *obj,         /* object to find */
+                                         DLIST_PRT_OBJECT *list) /* object list */
+{
+    OBJ_LIST_ITERATE_BEGIN( list);
         if ( node->elem == obj ) {
             return node;
         }
-        node = node->next;
-    }
+    OBJ_LIST_ITERATE_END();
+
     return NULL;
 }
 
-int PerformActionOnObjectsInList( DLIST_PRT_OBJECT *list, int (*func)(RT_OBJECT *))
+/**
+ * Delete object from object list.
+ *
+ * Returns:
+ *   TWC_TRUE, if object found and deleted
+ *   TWC_FALSE, otherwise
+ */
+TWC_BOOL RemoveObjectFromList( RT_OBJECT *obj,         /* object to remove */
+                               DLIST_PRT_OBJECT *list) /* object list */
 {
     DLIST_NODE_PRT_OBJECT *node;
 
-    node = list->first;
-    while ( node != NULL ) {
+    node = FindObjectInList( obj, list); 
+    if ( node != NULL ) {
+        DListRemove( list, node);
+        return 1;
+    }
+
+    return 0;
+}
+
+/**
+ * Call some function for each object in list as argument.
+ */
+int PerformActionOnObjectsInList( DLIST_PRT_OBJECT *list,   /* object list */
+                                  int (*func)(RT_OBJECT *)) /* function */
+{
+    OBJ_LIST_ITERATE_BEGIN( list);
         if ( func( node->elem) == 0 ) {
             return 0;
         }
-        node = node->next;
-    }
+    OBJ_LIST_ITERATE_END();
 
     return 1;
 }
 
-int GetObjectRect( RT_OBJECT *obj, RECT *rect)
+/**
+ * Get object position and size to RECT structure.
+ */
+int GetObjectRect( RT_OBJECT *obj, /* object */
+                   RECT *rect)     /* (out) pointer to RECT structure */
 {
     rect->left = obj->x;
     rect->right = obj->x + obj->width;
@@ -44,7 +85,10 @@ int GetObjectRect( RT_OBJECT *obj, RECT *rect)
     return 1;
 }
 
-int RoundByGrid( int x)
+/**
+ * Round value by current grid size.
+ */
+int RoundByGrid( int x) /* value */
 {
     return x - abs(x) % grid_size;
 }

@@ -36,7 +36,7 @@ int DeleteSelectedObjects()
  */
 int CopySelectedObjects()
 {
-    PlaceObjectListToClipboard( GetSelectedObjects());
+    AddObjectListToClipboard( GetSelectedObjects());
     return 1;
 }
 

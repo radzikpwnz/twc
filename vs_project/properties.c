@@ -380,7 +380,7 @@ int SetObjectPropertyStr( RT_OBJECT *obj,   /* object */
 {
     VALUE value;
 
-    value.s = val;
+    value.s = (TCHAR *)val;
     return SetObjectProperty( obj, prop_id, &value, update, apply);
 }
 

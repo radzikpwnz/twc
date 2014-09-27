@@ -3,11 +3,11 @@
 
 #include "object.h"
 
-DLIST_PRT_OBJECT *GetCurrentClipboard();
+DLIST_PRT_OBJECT *GetClipboard();
 int ClearClipboard();
 
-int PlaceObjectToClipboard( RT_OBJECT *obj);
-int PlaceObjectListToClipboard( DLIST_PRT_OBJECT *obj_list);
+int AddObjectToClipboard( RT_OBJECT *obj);
+int AddObjectListToClipboard( DLIST_PRT_OBJECT *obj_list);
 
 int PasteObjectsFromClipboard( RT_OBJECT *parent);
 

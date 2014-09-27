@@ -76,3 +76,4 @@ TWC Design version history:
 	-[new] New window property "Client size" wich allows you to set client size instead window size (enabled by default)
 	-[fix] Fixed combo-box sizing bug
 	-[fix] Selection frame is now same on all controls
+	-[fix] Controls are now pasted correctly, if originals were deleted

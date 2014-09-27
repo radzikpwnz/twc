@@ -114,3 +114,9 @@ int OnChangeListProperty(HWND hPropList, RT_OBJECT *obj, UINT prop_id)
 	}
 	return 1;
 }
+
+int ProcessChangedProperties()
+{
+    SendMessage( hPropList, PL_PROCESSCHANGEDPROP, 0, 0);
+    return 1;
+}

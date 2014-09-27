@@ -363,7 +363,7 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
 	return 1;
 
 err:
-	free( filebuf);
+	free( buf);
 	return 0;
 }
 

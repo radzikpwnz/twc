@@ -1,15 +1,12 @@
 #include <windows.h>
-#include <tchar.h>
 
 #include "twc_design.h"
 
-#include "..\property_list\proplist.h"
 #include "proplst.h"
-#include "properties.h"
 #include "interface.h"
-#include "window.h"
 #include "static.h"
 #include "project.h"
+#include "clipboard.h"
 
 #include "object.h"
 
@@ -96,9 +93,13 @@ int FreeObject( RT_OBJECT *obj) /* object */
     PROPERTY_INFO *propinfo;
     UINT prop_id, prop_count;
 
-    if (obj == NULL) return 1;
+    if ( obj == NULL ) {
+        return 1;
+    }
 
     TWC_CHECKIT( obj != current_object );
+
+    RemoveObjectFromList( obj, GetClipboard());
 
     /* Free child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
@@ -314,7 +315,7 @@ void SetCurrentObject( RT_OBJECT *obj) /* object */
 
     /* Process changed properties */
     if ( current_object ) {
-        SendMessage( hPropList, PL_PROCESSCHANGEDPROP, 0, 0);
+        ProcessChangedProperties();
     }
 
     prev_obj = current_object;

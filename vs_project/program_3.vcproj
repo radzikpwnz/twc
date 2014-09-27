@@ -278,10 +278,6 @@
 				>
 			</File>
 			<File
-				RelativePath=".\twc_design.c"
-				>
-			</File>
-			<File
 				RelativePath=".\win_stuff.c"
 				>
 			</File>

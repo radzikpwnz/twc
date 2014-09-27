@@ -10,7 +10,7 @@ static DLIST_PRT_OBJECT clipboard_content = {NULL, NULL, sizeof(RT_OBJECT *)};
 /**
  * Get clipboard contents.
  */
-DLIST_PRT_OBJECT *GetCurrentClipboard()
+DLIST_PRT_OBJECT *GetClipboard()
 {
     return &clipboard_content;
 }
@@ -27,7 +27,7 @@ int ClearClipboard()
 /**
  * Place object to clipboard.
  */
-int PlaceObjectToClipboard( RT_OBJECT *obj) /* object */
+int AddObjectToClipboard( RT_OBJECT *obj) /* object */
 {
     ClearClipboard();
     DListAdd( &clipboard_content, (void *)-1, &obj);
@@ -37,7 +37,7 @@ int PlaceObjectToClipboard( RT_OBJECT *obj) /* object */
 /**
  * Place object list to clipboard.
  */
-int PlaceObjectListToClipboard( DLIST_PRT_OBJECT *obj_list) /* object list */
+int AddObjectListToClipboard( DLIST_PRT_OBJECT *obj_list) /* object list */
 {
     ClearClipboard();
     DListClone( obj_list, &clipboard_content);
