@@ -198,7 +198,7 @@ static int CreateStaticOnControl( RT_OBJECT *obj) /* object */
     TWC_CHECKIT( obj->ctrl_id != CTRL_ID_WINDOW );
 
     hwnd = CreateWindowEx( 0, WC_STATIC, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, obj->x, obj->y, obj->width, obj->height,
-                    obj->parent->hwnd, NULL, GetModuleHandle(NULL), 0);
+                           obj->parent->hwnd, NULL, GetModuleHandle(NULL), 0);
     if ( hwnd == NULL ) {
         return 0;
     }
