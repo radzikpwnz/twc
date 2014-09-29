@@ -210,6 +210,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\cross-platform.c"
+				>
+			</File>
+			<File
 				RelativePath=".\ctrl_info.c"
 				>
 			</File>
@@ -309,6 +313,10 @@
 			</File>
 			<File
 				RelativePath=".\control_act.h"
+				>
+			</File>
+			<File
+				RelativePath=".\cross-platform.h"
 				>
 			</File>
 			<File

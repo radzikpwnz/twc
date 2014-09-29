@@ -1,7 +1,6 @@
 #include <stdio.h>
 
-#include "object.h"
-#include "properties.h"
+#include "twc_design.h"
 
 #include "project.h"
 #include "win_stuff.h"
@@ -44,19 +43,19 @@ static int MakeStyleStrings( RT_OBJECT *obj,      /* object */
     *p_ex = T('\0');
 
     /* Common actions */
-    custom_act = GetControlCodegenCustomAct( obj->ctrl_id);
+    custom_act = GetControlCodegenCustomAct( obj->id);
     if ( custom_act != NULL ) {
         custom_act( obj, PROPERTIES_ALL, &p_s, &p_ex);
     }
 
     /* Property-specific actions */
-    prop_count = GetControlPropertiesCount( obj->ctrl_id);
+    prop_count = GetControlPropertiesCount( obj->id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         prop_flags = GetObjectPropertyFlags( obj, prop_id);
-        propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+        propinfo = GetPropertyInfo( obj->id, prop_id);
         val = GetObjectPropertyVal( obj, prop_id);
 
-        act = &(GetPropertyInfo( obj->ctrl_id, prop_id)->on_codegen_act);
+        act = &(GetPropertyInfo( obj->id, prop_id)->on_codegen_act);
 
         if ( act->style_to_set != NULL && val->i == 1 ) {
             p_s = _mytcscpy( p_s, act->style_to_set);
@@ -141,10 +140,10 @@ static TCHAR *PrintObjectName( TCHAR *buf,     /* buffer */
  */
 static const TCHAR *GetObjectClassnameToWrite( RT_OBJECT *obj) /* object */
 {
-    if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
+    if ( obj->id == CTRL_ID_WINDOW ) {
         return GetObjectPropertyVal( obj, WINDOW_CLASSNAME)->s;
     } else {
-        return GetControlClassnameTWC( obj->ctrl_id);
+        return GetControlClassnameTWC( obj->id);
     }
 }
 
@@ -228,7 +227,7 @@ static int GenerateObjectCode( RT_OBJECT *obj) /* object */
 
     /* Write classname */
     p = _mytcscpy( p, T(" = {\n\t"));
-    if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
+    if ( obj->id == CTRL_ID_WINDOW ) {
         p = _mytcscpy( p, T("TEXT(\""));
         p = _mytcscpy( p, GetObjectClassnameToWrite( obj));
         p = _mytcscpy( p, T("\")"));

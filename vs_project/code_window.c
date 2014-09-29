@@ -48,7 +48,7 @@ int GenerateEventHandler(RT_OBJECT *obj, CONTROL_EVENT_INFO *cei, TCHAR **pbuf) 
 	TCHAR *p;
 	int i;
 
-	len = _tcslen(obj->name) + 1 + ((obj->ctrl_id == CTRL_ID_WINDOW) ? 0 : (_tcslen(obj->parent->name) + 1)) + _tcslen(cei->name); //handler_name
+	len = _tcslen(obj->name) + 1 + ((obj->id == CTRL_ID_WINDOW) ? 0 : (_tcslen(obj->parent->name) + 1)) + _tcslen(cei->name); //handler_name
 	i = 0;
 	while (cei->param[i].name != NULL) {
 		type_len = _tcslen(cei->param[i].type);
@@ -61,7 +61,7 @@ int GenerateEventHandler(RT_OBJECT *obj, CONTROL_EVENT_INFO *cei, TCHAR **pbuf) 
 	p = *pbuf;
 	
 	//handler name
-	if (obj->ctrl_id != CTRL_ID_WINDOW) {
+	if (obj->id != CTRL_ID_WINDOW) {
 		p = _mytcscpy(p, obj->parent->name);
 		*p++ = T('_');
 	}

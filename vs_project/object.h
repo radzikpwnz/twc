@@ -24,47 +24,32 @@ enum {
  * Main object info structure
  */
 struct tagRT_OBJECT {
-    /* name */
-    TCHAR *name;
+    UINT id;                        /* object ID */
+    DLIST_PRT_OBJECT child_list;    /* child list */
 
-    /* class name */
-    TCHAR *classname;
-    /* position and size*/
-    int x, y;
-    int width, height;
-    /* title or text */
-    TCHAR *title;
-    /* style and extended style */
-    DWORD style;
+    int selected;                   /* if object selected */ 
+    int x, y;                       /* position */
+    int width, height;              /* size */
+
+    RT_OBJECT *parent;              /* parent object (NULL for window) */
+    PROPERTY *properties;           /* properties array */
+    
+    TCHAR *classname;               /* class name */
+    HWND hwnd;                      /* object and static HWND */ 
+    HWND static_hwnd;           
+    WNDPROC orig_wndproc;           /* object and static original window procedures */
+    WNDPROC static_orig_wndproc;
+    DWORD style;                    /* style and extended style */
     DWORD exstyle;
-    /* window HWND */
-    HWND hwnd;
-    /* flags */
-    UINT flags;
 
-    /* control ID */
-    UINT ctrl_id;
-    /* properties array */
-    PROPERTY *properties;
+    TCHAR *name;                    /* name */
+    TCHAR *title;                   /* title or text */
+    UINT flags;                     /* flags */
 
     /* pointer to list node, containing object */
     DLIST_NODE_PRT_OBJECT *lstnode_ptr;
-
-    /* parent object (NULL for window) */
-    RT_OBJECT *parent;
-    /* child list */
-    DLIST_PRT_OBJECT child_list;
-
-    /* if object selected */
-    int selected;
-    CODE_WINDOW *code_window;
-
-    /* object and static original window procedures */
-    WNDPROC orig_wndproc;
-    WNDPROC static_orig_wndproc;
-
-    /* static HWND */
-    HWND static_hwnd;
+      
+    CODE_WINDOW *code_window;       /* code window if exists */
 };
 
 /**
@@ -131,3 +116,13 @@ void SetCurrentObject( RT_OBJECT *obj);
 }
 
 #endif
+
+
+/* If object is control (incl window) or not */
+#define IsObjectControl( obj) ( (obj)->obj_id >= CONTROL_FIRST_ID )
+
+/* If object is root */
+#define IsObjectRoot( obj) ( (obj)->obj_id == CTRL_ID_ROOT )
+
+/* If object is undefined */
+#define IsObjectUndefined( obj) ( (obj)->obj_id == CTRL_ID_UNDEFINED )

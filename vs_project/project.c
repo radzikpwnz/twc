@@ -4,8 +4,35 @@
 
 #include "project.h"
 
+
 /* Current project info */
-TWCD_PROJECT cur_project = {{0, 0}, {NULL, NULL, sizeof(RT_CONTROL *)}, NULL};
+TWCD_PROJECT *cur_project;
+
+
+TWCD_PROJECT *NewProject()
+{
+    TWCD_PROJECT *project;
+    RT_OBJECT *root_obj;
+
+    project = malloc( sizeof(TWCD_PROJECT))
+
+    root_obj = (RT_OBJECT *)calloc( 1, sizeof(RT_OBJECT));
+    root_obj->id = CTRL_ID_ROOT;
+    DListInit( root_obj->child_list, sizeof(PRT_OBJECT));
+
+    project->root_object = root_obj;
+
+    return project;
+}
+
+//TODO: copy project
+
+int FreeProject( TWCD_PROJECT *project)
+{
+    FreeObject( project->root_object);
+    free( project->path);
+    return 1;
+}
 
 /**
  * Get parent object child list.
@@ -14,7 +41,8 @@ TWCD_PROJECT cur_project = {{0, 0}, {NULL, NULL, sizeof(RT_CONTROL *)}, NULL};
  */
 DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj) /* object */
 {
-    return ( obj->parent == NULL ) ? &cur_project.obj_list : &obj->parent->child_list;
+    TWC_CHECKIT( obj->id != CTRL_ID_ROOT );
+    return &obj->parent->child_list;
 }
 
 /**

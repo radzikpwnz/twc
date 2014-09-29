@@ -1,10 +1,21 @@
 #ifndef TWC_DESIGN_H
 #define TWC_DESIGN_H
 
-#include <windows.h>
-#include <CommCtrl.h>
-#include <tchar.h>
+#define WINDOWS ( defined( _WIN32) || defined( WIN32) )
+#define LINUX ( defined( linux) || defined( __linux__) )
 
+#if WINDOWS
+    #include <windows.h>
+    #include <CommCtrl.h>
+    #include <tchar.h>
+#endif
+
+#if LINUX
+    #include <unistd.h>
+    #include <stdlib.h>
+    #include <stdio.h>
+    #include <string.h>
+#endif
 
 #define TWC_CHECKERS_ENABLED
 

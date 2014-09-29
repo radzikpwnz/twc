@@ -220,7 +220,7 @@ static void PropOnSetCustomAction_Button( RT_OBJECT *obj, UINT prop_id)
 
     obj->style &= ~BS_TYPEMASK;
 
-    switch ( obj->ctrl_id ) {
+    switch ( obj->id ) {
         case CTRL_ID_BUTTON:
             break;
         case CTRL_ID_CHECKBOX:
@@ -250,7 +250,7 @@ static void PropCodegenCustomAction_Button( RT_OBJECT *obj, UINT prop_id, TCHAR 
 
     TWC_CHECKIT( prop_id == PROPERTIES_ALL );
 
-    switch ( obj->ctrl_id ) {
+    switch ( obj->id ) {
         case CTRL_ID_BUTTON:
             break;
         case CTRL_ID_CHECKBOX:
@@ -828,7 +828,7 @@ CONTROL_INFO *GetControlInfo( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
-    return &control_info[ctrl_id];
+    return &control_info[ctrl_id - CONTROL_FIRST_ID];
 }
 
 PROPERTY_INFO *GetPropertyInfo( UINT ctrl_id, UINT prop_id)
@@ -844,42 +844,42 @@ PROPERTY_INFO *GetPropertyInfo( UINT ctrl_id, UINT prop_id)
     //Control-specific properties
     prop_id -= COMMON_PROPERTIES_END;
     
-    return &control_info[ctrl_id].property_info[prop_id];
+    return &control_info[ctrl_id - CONTROL_FIRST_ID].property_info[prop_id];
 }
 
 UINT GetControlPropertiesCount( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
-    return control_info[ctrl_id].properties_count;
+    return control_info[ctrl_id - CONTROL_FIRST_ID].properties_count;
 }
 
 TCHAR *GetControlClassname( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
-    return control_info[ctrl_id].class_name;
+    return control_info[ctrl_id - CONTROL_FIRST_ID].class_name;
 }
 
 TCHAR *GetControlClassnameTWC( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
-    return control_info[ctrl_id].class_name_twc;
+    return control_info[ctrl_id - CONTROL_FIRST_ID].class_name_twc;
 }
 
 TCHAR *GetControlDefaultObjectName( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
-    return control_info[ctrl_id].def_obj_name;
+    return control_info[ctrl_id - CONTROL_FIRST_ID].def_obj_name;
 }
 
 PROP_CODEGEN_CUSTOM_ACT_FUNC GetControlCodegenCustomAct( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
-    return control_info[ctrl_id].codegen_custom_act;
+    return control_info[ctrl_id - CONTROL_FIRST_ID].codegen_custom_act;
 }
 
 UINT GetPropertyIdByName( TCHAR *name, UINT ctrl_id)

@@ -37,7 +37,7 @@ int UpdateSingleListProperty(HWND hPropList, RT_OBJECT *obj, UINT prop_id, const
 
 	iteminfo.id = prop_id;
 
-    InitItemInfoByValue( &iteminfo, val, GetPropertyInfo( obj->ctrl_id, prop_id)->type);
+    InitItemInfoByValue( &iteminfo, val, GetPropertyInfo( obj->id, prop_id)->type);
 
 	SendMessage(hPropList, PL_SETITEMVALUE, (WPARAM)&iteminfo, 0);
 	return 1;
@@ -49,7 +49,7 @@ static int AddSingleProperty(HWND hPropList, RT_OBJECT *obj, UINT prop_id)
     PROPERTY_INFO *propinfo;
     VALUE *val;
     
-    propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+    propinfo = GetPropertyInfo( obj->id, prop_id);
     val = GetObjectPropertyVal( obj, prop_id);
 
 	iteminfo.name = propinfo->dname;
@@ -81,7 +81,7 @@ int LoadPropertyList(HWND hPropList, RT_OBJECT *obj)
 
 	SendMessage( hPropList, PL_STARTFILL, 0, 0);
 
-    prop_count = GetControlPropertiesCount( obj->ctrl_id);
+    prop_count = GetControlPropertiesCount( obj->id);
 
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         AddSingleProperty( hPropList, obj, prop_id);

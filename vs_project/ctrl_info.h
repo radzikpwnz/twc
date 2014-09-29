@@ -7,10 +7,13 @@
 // Control list //
 //////////////////
 
-#define CONTROL_FIRST_ID 0
+enum CONTROL_ID_INTERNAL {
+    CTRL_ID_UNDEFINED = 0,
+    CTRL_ID_ROOT,
+    CONTROL_FIRST_ID,
+};
 
 enum CONTROL_ID {
-    CTRL_ID_UNDEFINED = -1,
 	CTRL_ID_WINDOW = CONTROL_FIRST_ID,
 	CTRL_ID_BUTTON,
 	CTRL_ID_CHECKBOX,

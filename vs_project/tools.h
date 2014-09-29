@@ -9,6 +9,7 @@
 #ifdef TWC_CHECKERS_ENABLED
 
 #define TWC_CHECKIT(x) { if ( !(x) ) twc_Fatal( T(__FILE__), __LINE__); }
+#define TWC_CHECKDO(x) TWC_CHECKIT(x)
 
 /* Terminate program and show error message */
 void twc_Fatal( TCHAR *file, int line);
@@ -16,6 +17,7 @@ void twc_Fatal( TCHAR *file, int line);
 #else
 
 #define TWC_CHECKIT(x)
+#define TWC_CHECKDO(x) (x)
 
 #endif
 

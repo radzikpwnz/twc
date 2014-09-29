@@ -197,7 +197,7 @@ static int ParsePropertyVal( RT_OBJECT *obj, /* object */
 	}
 
     /* Compare property type and value type */
-	propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+	propinfo = GetPropertyInfo( obj->id, prop_id);
 	if ( lex.id == LEX_STRVAL && propinfo->type != T_STR
          || lex.id == LEX_INTVAL && (propinfo->type != T_INT && propinfo->type != T_LIST && propinfo->type != T_BOOL) ) {
 		parse_err = ERR_SYNTAX;
@@ -388,11 +388,11 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
 	}
 
     /* Write CTRL/WND label, control name if CTRL, and { */
-	if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
+	if ( obj->id == CTRL_ID_WINDOW ) {
 		p = _mytcscpy( p, T("WND {\n"));
 	} else {
 		p = _mytcscpy( p, T("CTRL "));
-		p = _mytcscpy( p, control_strings[obj->ctrl_id]);
+		p = _mytcscpy( p, control_strings[obj->id]);
 		p = _mytcscpy( p, T(" {\n"));
 	}
 
@@ -404,11 +404,11 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
 	depth++;
 
     /* Write properties */
-    prop_count = GetControlPropertiesCount( obj->ctrl_id);
+    prop_count = GetControlPropertiesCount( obj->id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         prop_flags = GetObjectPropertyFlags( obj, prop_id);
         if ( (prop_flags & PROPERTY_FLAG_SET) && !(prop_flags & PROPERTY_FLAG_DEFAULT) ) {
-            propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+            propinfo = GetPropertyInfo( obj->id, prop_id);
             val = GetObjectPropertyVal( obj, prop_id);
 
             /* Write tabs depending on current depth */

@@ -10,6 +10,7 @@
 
 #include "object.h"
 
+
 /**
  * Create new object.
  */
@@ -24,8 +25,8 @@ RT_OBJECT *NewObject( UINT ctrl_id) /* control ID */
     memset( obj, 0, sizeof(RT_OBJECT));
     DListInit( &obj->child_list, sizeof(PRT_OBJECT));
 
-    obj->ctrl_id = ctrl_id;
-    if ( ctrl_id != CTRL_ID_UNDEFINED ) {
+    obj->id = ctrl_id;
+    if ( ctrl_id >= CONTROL_FIRST_ID ) {
         /* Alloc memory for properties */
         obj->classname = GetControlClassname( ctrl_id);
         obj->properties = (PROPERTY *)calloc( 1, GetControlPropertiesCount( ctrl_id) * sizeof(PROPERTY));
@@ -46,7 +47,7 @@ RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
     UINT prop_id, prop_count;
 
     /* Create new object and copy obj bytewise */
-    new_obj = NewObject( obj->ctrl_id);
+    new_obj = NewObject( obj->id);
     memcpy( new_obj, obj, sizeof(RT_OBJECT));
 
     /* Copy classname */
@@ -54,21 +55,26 @@ RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
     /* Set parent */
     new_obj->parent = parent;
 
-    /* Null some window-specific fields and selection flag*/
+    /* Null some platform-specific fields and selection flag*/
+#if WINDOWS
     new_obj->hwnd = 0;
-    new_obj->selected = 0;
     new_obj->orig_wndproc = NULL;
     new_obj->static_orig_wndproc = NULL;
     new_obj->static_hwnd = NULL;
+#elif LINUX
 
+#endif
+
+    new_obj->selected = 0;
+    
     /* Copy properties */
-    prop_count = GetControlPropertiesCount( obj->ctrl_id);
+    prop_count = GetControlPropertiesCount( obj->id);
     new_obj->properties = malloc( prop_count * sizeof(PROPERTY));
     memcpy( new_obj->properties, obj->properties, prop_count * sizeof(PROPERTY));
 
     /* Copy strings for string properties */
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
-        propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+        propinfo = GetPropertyInfo( obj->id, prop_id);
         val = GetObjectPropertyVal( new_obj, prop_id);
         if ( propinfo->type == T_STR ) {
             SetString( &(val->s), val->s, 1);
@@ -77,7 +83,7 @@ RT_OBJECT *CopyObject( RT_OBJECT *obj,    /* object to copy */
 
     /* Generate object name and make title point to title property value */
     GenerateObjectName(new_obj);
-    new_obj->title = GetObjectPropertyVal(new_obj, COMMON_TITLE)->s;
+    new_obj->title = GetObjectPropertyVal( new_obj, COMMON_TITLE)->s;
 
     /* Add object to parent's child list */
     new_obj->lstnode_ptr = DListAdd( GetParentChildList( new_obj), (void *)-1, &new_obj);
@@ -109,9 +115,9 @@ int FreeObject( RT_OBJECT *obj) /* object */
     TWC_CHECKIT( obj->child_list.count == 0 );
 
     /* Free string values of properties */
-    prop_count = GetControlPropertiesCount( obj->ctrl_id);
+    prop_count = GetControlPropertiesCount( obj->id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
-        propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+        propinfo = GetPropertyInfo( obj->id, prop_id);
         if ( propinfo->type == T_STR ) {
             free( GetObjectPropertyVal( obj, prop_id)->s);
         }
@@ -121,7 +127,7 @@ int FreeObject( RT_OBJECT *obj) /* object */
     /* Delete object from parent's child list */
     DListRemove( GetParentChildList( obj), obj->lstnode_ptr);
 
-    free(obj);
+    free( obj);
 
     return 1;
 }
@@ -137,18 +143,23 @@ void PrepareObject( RT_OBJECT *obj) /* object */
     /* Load defaults for all properties */
     SetObjectPropertyDefaultValue( obj, PROPERTIES_ALL);
 
+#if WINDOWS
     /* Set styles, witch not covered by properties */
-    if ( obj->ctrl_id == CTRL_ID_WINDOW ) {
+    if ( obj->id == CTRL_ID_WINDOW ) {
         obj->style |= WS_OVERLAPPEDWINDOW | WS_CLIPSIBLINGS/* | WS_CLIPCHILDREN*/;
         /* obj->exstyle = WS_EX_COMPOSITED */;
     } else {
         obj->style |= WS_CHILD/* | WS_CLIPSIBLINGS*/;
-        switch ( obj->ctrl_id ) {
+        switch ( obj->id ) {
             case CTRL_ID_GROUPBOX:
                 obj->style |= BS_GROUPBOX;
                 break;
         }
     }
+#elif LINUX
+
+#endif
+
     return;
 }
 
@@ -157,7 +168,7 @@ void PrepareObject( RT_OBJECT *obj) /* object */
  */
 void SetNewObjectDefaultValues( RT_OBJECT *obj) /* object */
 {
-    switch ( obj->ctrl_id ) {
+    switch ( obj->id ) {
         case CTRL_ID_WINDOW:
             SetObjectPropertyStr( obj, COMMON_TITLE, T("New window"), TWC_TRUE, TWC_FALSE);
             break;
@@ -188,6 +199,8 @@ void SetNewObjectDefaultValues( RT_OBJECT *obj) /* object */
     return;
 }
 
+#if WINDOWS
+
 /**
  * Create static on control.
  */
@@ -195,7 +208,7 @@ static int CreateStaticOnControl( RT_OBJECT *obj) /* object */
 {
     HWND hwnd;
 
-    TWC_CHECKIT( obj->ctrl_id != CTRL_ID_WINDOW );
+    TWC_CHECKIT( obj->id != CTRL_ID_WINDOW );
 
     hwnd = CreateWindowEx( 0, WC_STATIC, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, obj->x, obj->y, obj->width, obj->height,
                            obj->parent->hwnd, NULL, GetModuleHandle(NULL), 0);
@@ -223,9 +236,9 @@ static int InitObjectAfterCreation( RT_OBJECT *obj,    /* object */
     /* Set OBJECT_INFO property and window procedure */
     SetProp( obj->hwnd, TEXT("OBJECT_INFO"), (HANDLE)obj);
     obj->orig_wndproc = (WNDPROC)SetWindowLongPtr( obj->hwnd, GWLP_WNDPROC,
-                        (( obj->ctrl_id != CTRL_ID_WINDOW ) ? (LONG_PTR)ControlWndProc : (LONG_PTR)ChildWndProc) );
+                        (( obj->id != CTRL_ID_WINDOW ) ? (LONG_PTR)ControlWndProc : (LONG_PTR)ChildWndProc) );
 
-    if ( obj->ctrl_id != CTRL_ID_WINDOW ) {
+    if ( obj->id != CTRL_ID_WINDOW ) {
         /* Set control position (need for some controls to do it twice), create static and set font */
         SetWindowPos( obj->hwnd, insert_after, obj->x, obj->y, obj->width, obj->height, 0);
         CreateStaticOnControl( obj);
@@ -234,6 +247,10 @@ static int InitObjectAfterCreation( RT_OBJECT *obj,    /* object */
 
     return 1;
 }
+
+#elif LINUX
+
+#endif
 
 /**
  * Create object window.
@@ -327,12 +344,12 @@ void SetCurrentObject( RT_OBJECT *obj) /* object */
     }
 
     /* Redraw previous object if it is not window */
-    if ( prev_obj && prev_obj->ctrl_id != CTRL_ID_WINDOW ) {
+    if ( prev_obj && prev_obj->id != CTRL_ID_WINDOW ) {
         RedrawWindow( prev_obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 
     /* Redraw current object if it is not window */
-    if ( current_object && current_object != prev_obj && current_object->ctrl_id != CTRL_ID_WINDOW ) {
+    if ( current_object && current_object != prev_obj && current_object->id != CTRL_ID_WINDOW ) {
         RedrawWindow( current_object->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 

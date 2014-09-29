@@ -116,7 +116,7 @@ LRESULT CALLBACK StaticWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			
 			ReleaseToolboxElemSelection();
 
-			if ( obj->ctrl_id == CTRL_ID_STATUSBAR ) return 0; //TODO: fix
+			if ( obj->id == CTRL_ID_STATUSBAR ) return 0; //TODO: fix
 
 			if ( new_control ) {
 				new_control = 0;
@@ -203,7 +203,7 @@ LRESULT CALLBACK StaticWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
 			if (sizing) {
 				sizing = 0;
 				dir.left = dir.top = dir.right = dir.bottom = 0;
-				if (obj->ctrl_id == CTRL_ID_LISTBOX && !(obj->style & LBS_NOINTEGRALHEIGHT)) {
+				if (obj->id == CTRL_ID_LISTBOX && !(obj->style & LBS_NOINTEGRALHEIGHT)) {
 					GetWindowRect(hwnd, &rect);
 					MapWindowPoints( HWND_DESKTOP, GetParent(hwnd), (LPPOINT)&rect, 2);
 					rect.bottom -= rect.bottom % SendMessage(obj->hwnd, LB_GETITEMHEIGHT, 0, 0);

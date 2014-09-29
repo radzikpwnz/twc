@@ -25,13 +25,13 @@ int GenerateObjectName( RT_OBJECT *obj) /* object */
     TCHAR *default_name;
 
     /* Get default object name */
-    default_name = GetControlDefaultObjectName( obj->ctrl_id);
+    default_name = GetControlDefaultObjectName( obj->id);
 	ok = 0;
 
     /* Add number after default name until it become unique */
 next:
 	while (!ok) {
-		_stprintf( buf, T("%s%d"), default_name, ++control_names_usage[obj->ctrl_id]);
+		_stprintf( buf, T("%s%d"), default_name, ++control_names_usage[obj->id]);
 
         obj_node = GetParentChildList( obj)->first;
 		while (obj_node != NULL) {
@@ -166,7 +166,7 @@ static int UpdateObjectPropertyInternal( RT_OBJECT *obj, /* object */
     PROPERTY *prop;
 
     /* Get property info and property */
-    propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+    propinfo = GetPropertyInfo( obj->id, prop_id);
 	act = &(propinfo->on_set_act);
     prop = GetObjectProperty( obj, prop_id);
 
@@ -211,7 +211,7 @@ int UpdateObjectProperty( RT_OBJECT *obj, /* object */
     TWC_CHECKIT( prop_id != PROPERTY_UNDEFINED );
 
     if ( prop_id == PROPERTIES_ALL ) {
-        prop_count = GetControlPropertiesCount( obj->ctrl_id);
+        prop_count = GetControlPropertiesCount( obj->id);
         for ( i = 0; i < prop_count; i++ ) {
             UpdateObjectPropertyInternal( obj, i, TWC_FALSE);
         }
@@ -260,7 +260,7 @@ int PropertyFilter( RT_OBJECT *obj, /* object */
 				}
 				break;
 			case COMMON_BORDER:
-				if ( obj->ctrl_id == CTRL_ID_WINDOW ) return PF_WRONG;
+				if ( obj->id == CTRL_ID_WINDOW ) return PF_WRONG;
 				break;
 			case COMMON_CUSTOMSTYLE:
 				if ( val->s[0] == T('\0') ) {
@@ -268,7 +268,7 @@ int PropertyFilter( RT_OBJECT *obj, /* object */
 				}
 				break;
 		}
-	} else if ( obj->ctrl_id == -1 ) {
+	} else if ( obj->id == -1 ) {
         /* Window properties */
 		switch ( prop_id ) {
 			case WINDOW_CLASSNAME:
@@ -276,7 +276,7 @@ int PropertyFilter( RT_OBJECT *obj, /* object */
 		}
 	} else {
         /* Control properties */
-		switch ( obj->ctrl_id ) {
+		switch ( obj->id ) {
 			case CTRL_ID_COMBOBOX:
 				if ( obj->style & CBS_SIMPLE && obj->style & CBS_DROPDOWN ) {
 					switch ( prop_id ) {
@@ -331,7 +331,7 @@ PROPERTY *GetObjectProperty( RT_OBJECT *obj, /* object */
                              UINT prop_id)   /* property ID */
 {
     TWC_CHECKIT( prop_id != PROPERTIES_ALL);
-    TWC_CHECKIT( prop_id < GetControlPropertiesCount( obj->ctrl_id) );
+    TWC_CHECKIT( prop_id < GetControlPropertiesCount( obj->id) );
 
 	return &obj->properties[prop_id];
 }
@@ -396,7 +396,7 @@ int SetObjectProperty( RT_OBJECT *obj,       /* object */
 	PROPERTY_INFO *propinfo;
 	PROPERTY *prop;
 
-	propinfo = GetPropertyInfo(obj->ctrl_id, prop_id);
+	propinfo = GetPropertyInfo(obj->id, prop_id);
     prop = GetObjectProperty( obj, prop_id);
 
     TWC_CHECKIT( !(propinfo->type == T_STR && new_val->s == NULL) );
@@ -454,13 +454,13 @@ int SetObjectPropertyDefaultValue( RT_OBJECT *obj, /* object */
     TWC_CHECKIT( obj != NULL );
 
     if ( prop_id == PROPERTIES_ALL ) {
-        prop_count = GetControlPropertiesCount( obj->ctrl_id);
+        prop_count = GetControlPropertiesCount( obj->id);
         for ( i = 0; i < prop_count; i++ ) {
-            propinfo = GetPropertyInfo( obj->ctrl_id, i);
+            propinfo = GetPropertyInfo( obj->id, i);
             SetObjectProperty( obj, i, &(propinfo->default_caption), TWC_TRUE, TWC_FALSE);
         }
     } else {
-        propinfo = GetPropertyInfo( obj->ctrl_id, prop_id);
+        propinfo = GetPropertyInfo( obj->id, prop_id);
         SetObjectProperty( obj, prop_id, &(propinfo->default_caption), TWC_TRUE, TWC_FALSE);
     }
 

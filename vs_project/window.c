@@ -200,7 +200,7 @@ HWND AddWindow()
     SetObjectPropertyInt( obj, COMMON_WIDTH, (rect.right - rect.left) / 2, TWC_TRUE, TWC_FALSE);
     SetObjectPropertyInt( obj, COMMON_HEIGHT, (rect.bottom - rect.top) / 2, TWC_TRUE, TWC_FALSE);
 
-    obj->parent = NULL;
+    obj->parent = (RT_OBJECT *)&cur_project;
 
     if ( CreateObjectWindow( obj, TWC_FALSE) == 0 )
     {
@@ -208,7 +208,7 @@ HWND AddWindow()
         return NULL;
     }
 
-	obj ->lstnode_ptr = DListAdd( &cur_project.obj_list, (void *)-1, &obj);
+	obj->lstnode_ptr = DListAdd( &obj->parent->child_list, (void *)-1, &obj);
 	GenerateObjectName( obj);
 	
     SetCurrentObject( obj);
@@ -220,15 +220,15 @@ HWND AddWindow()
 int InitControlView(RT_OBJECT *obj, HWND hwnd)
 {
 
-	if (obj->ctrl_id == CTRL_ID_PROGRESSBAR) {
+	if (obj->id == CTRL_ID_PROGRESSBAR) {
 		SendMessage(hwnd, PBM_SETPOS, 30, 0);
-	} else if (obj->ctrl_id == CTRL_ID_UPDOWN) {
+	} else if (obj->id == CTRL_ID_UPDOWN) {
 		SetWindowPos(hwnd, NULL, 0, 0, obj->width, obj->height, SWP_NOMOVE | SWP_NOZORDER);
-	} else if (obj->ctrl_id == CTRL_ID_LISTBOX) {
+	} else if (obj->id == CTRL_ID_LISTBOX) {
 		SendMessage(hwnd, LB_ADDSTRING, 0, (LPARAM)T("Item 1"));
 		SendMessage(hwnd, LB_ADDSTRING, 0, (LPARAM)T("Item 2"));
 		SendMessage(hwnd, LB_ADDSTRING, 0, (LPARAM)T("Item 3"));
-	} else if (obj->ctrl_id == CTRL_ID_COMBOBOX) {
+	} else if (obj->id == CTRL_ID_COMBOBOX) {
 		if (obj->style & CBS_UPPERCASE || obj->style & CBS_LOWERCASE) return 1;
 		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)T("Item 1"));
 		SendMessage(hwnd, CB_ADDSTRING, 0, (LPARAM)T("Item 2"));
@@ -260,15 +260,15 @@ int PreviewWindow(RT_OBJECT *obj, HWND hParent)
         AdjustWindowRect( &rect, obj->style, FALSE);
     }
 
-	hwnd = CreateWindowEx( obj->exstyle, ((obj->ctrl_id != -1) ? obj->classname : T("DefaultWnd")), obj->title, obj->style,
+	hwnd = CreateWindowEx( obj->exstyle, ((obj->id != -1) ? obj->classname : T("DefaultWnd")), obj->title, obj->style,
                            x, y, rect.right - rect.left, rect.bottom - rect.top, hParent, NULL, GetModuleHandle(NULL), NULL);
 
 	if ( !hwnd ) return 0;
 
 	if ( hParent != hMainWnd ) {
-		if ( obj->ctrl_id == CTRL_ID_UPDOWN ) {
+		if ( obj->id == CTRL_ID_UPDOWN ) {
 			SetWindowPos(hwnd, NULL, 0, 0, obj->width, obj->height, SWP_NOMOVE | SWP_NOZORDER);
-		} else if (obj->ctrl_id == CTRL_ID_COMBOBOX) {
+		} else if (obj->id == CTRL_ID_COMBOBOX) {
 			val = GetObjectPropertyVal( obj, COMBOBOX_TYPE);
 			if (val->i != 0) SetWindowPos( hwnd, NULL, 0, 0, obj->width, obj->height * 4, SWP_NOMOVE | SWP_NOZORDER);
 		}
