@@ -112,7 +112,7 @@ static void SetMainWndTitle()
     TCHAR *buf, *p;
 
     buf = malloc(4096);
-    p = _mytcscpy(_mytcscpy(buf, T("TWC Design - [")), cur_project.path);
+    p = _mytcscpy(_mytcscpy(buf, T("TWC Design - [")), cur_project->path);
     *p++ = ']';
     *p = '\0';
 
@@ -146,7 +146,7 @@ static void SaveProjectToSelectedFile(TWCD_PROJECT *project)
     }
     SetString( &project->path, buf, 1);
     free( buf);
-    SetStatusText( cur_project.path);
+    SetStatusText( cur_project->path);
     SetMainWndTitle();
 
     return;
@@ -154,15 +154,15 @@ static void SaveProjectToSelectedFile(TWCD_PROJECT *project)
 
 static int AskForSave()
 {
-    if (cur_project.path != NULL) {
+    if (cur_project->path != NULL) {
         switch (MessageBox(hMainWnd, T("Save current project?"), T("TWC Design"), MB_YESNOCANCEL)) {
             case IDCANCEL: return 0;
-            case IDYES: SaveProjectToFile(&cur_project, NULL);
+            case IDYES: SaveProjectToFile(cur_project, NULL);
         }
-    } else if (cur_project.obj_list.first != NULL) {
+    } else if ( GetProjectChildList( cur_project)->first != NULL ) {
         switch (MessageBox(hMainWnd, T("Save current project?"), T("TWC Design"), MB_YESNOCANCEL)) {
             case IDCANCEL: return 0;
-            case IDYES: SaveProjectToSelectedFile(&cur_project);
+            case IDYES: SaveProjectToSelectedFile(cur_project);
         }
     }
     return 1;
@@ -205,7 +205,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 						actSaveProject();
 						break;
 					case ID_FILE_SAVEPROJECTAS:
-						SaveProjectToSelectedFile(&cur_project);
+						SaveProjectToSelectedFile(cur_project);
 						break;
                     case ID_FILE_SETTINGS:
 
@@ -269,11 +269,11 @@ void Resize(int width, int height)
 void actGenerateCode()
 {
     SetStatusText( T("Generating code..."));
-    if ( GenerateProjectCode( &cur_project) == 0 ) {
+    if ( GenerateProjectCode( cur_project) == 0 ) {
         MessageBox( hMainWnd, T("Error generating code!"), T("Error"), 0);
     }
-    if ( cur_project.path ) {
-        SetStatusText( cur_project.path);
+    if ( cur_project->path ) {
+        SetStatusText( cur_project->path);
     } else {
         SetStatusText( T("Ready!"));
     }
@@ -282,10 +282,13 @@ void actGenerateCode()
 
 void actNewProject()
 {
-    if ( AskForSave() == 0 ) {
-        return;
+    if ( cur_project != NULL ) {
+        if ( AskForSave() == 0 ) {
+            return;
+        }
+        UnloadCurrentProject();
     }
-    UnloadCurrentProject();
+    cur_project = NewProject();
     AddWindow();
     SetStatusText( T("<New project>"));
     return;
@@ -322,7 +325,7 @@ void actOpenProject()
 
     SetStatusText( T("Loading project..."));
     LoadCurrentProject();
-    SetStatusText( cur_project.path);
+    SetStatusText( cur_project->path);
     SetMainWndTitle();
     free( buf);
 
@@ -331,10 +334,10 @@ void actOpenProject()
 
 void actSaveProject()
 {
-    if ( cur_project.path != NULL ) {
-        SaveProjectToFile( &cur_project, NULL);
+    if ( cur_project->path != NULL ) {
+        SaveProjectToFile( cur_project, NULL);
     } else {
-        SaveProjectToSelectedFile( &cur_project);
+        SaveProjectToSelectedFile( cur_project);
     }
     return;
 }

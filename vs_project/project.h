@@ -20,6 +20,12 @@ extern TWCD_PROJECT *cur_project;
  * Get parent object child list.
  */
 DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj);
+DLIST_PRT_OBJECT *GetProjectChildList( TWCD_PROJECT *project);
+
+TWCD_PROJECT *NewProject();
+int FreeProject( TWCD_PROJECT *project);
+
+DLIST_PRT_OBJECT *GetProjectChildList( TWCD_PROJECT *project);
 
 int LoadCurrentProject();
 

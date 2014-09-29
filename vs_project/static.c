@@ -81,6 +81,7 @@ LRESULT CALLBACK StaticWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPara
     switch ( msg ) {
         case WM_NCDESTROY:
             RemoveProp( hwnd, T("OBJECT_INFO"));
+            obj->static_hwnd = NULL;
             break;
         case WM_SETCURSOR:
             return 1;

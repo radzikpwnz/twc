@@ -78,6 +78,7 @@ LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     switch (msg) {
         case WM_NCDESTROY:
             RemoveProp( hwnd, T("OBJECT_INFO"));
+            cur_wnd->hwnd = NULL;
             break;
         case WM_CLOSE:
             if ( !DeleteWindow( cur_wnd) ) {
@@ -200,7 +201,7 @@ HWND AddWindow()
     SetObjectPropertyInt( obj, COMMON_WIDTH, (rect.right - rect.left) / 2, TWC_TRUE, TWC_FALSE);
     SetObjectPropertyInt( obj, COMMON_HEIGHT, (rect.bottom - rect.top) / 2, TWC_TRUE, TWC_FALSE);
 
-    obj->parent = (RT_OBJECT *)&cur_project;
+    obj->parent = cur_project->root_object;
 
     if ( CreateObjectWindow( obj, TWC_FALSE) == 0 )
     {
@@ -208,7 +209,7 @@ HWND AddWindow()
         return NULL;
     }
 
-	obj->lstnode_ptr = DListAdd( &obj->parent->child_list, (void *)-1, &obj);
+	obj->lstnode_ptr = DListAdd( GetParentChildList( obj), (void *)-1, &obj);
 	GenerateObjectName( obj);
 	
     SetCurrentObject( obj);

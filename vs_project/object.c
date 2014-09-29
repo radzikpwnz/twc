@@ -103,14 +103,19 @@ int FreeObject( RT_OBJECT *obj) /* object */
         return 1;
     }
 
-    TWC_CHECKIT( obj != current_object );
-
-    RemoveObjectFromList( obj, GetClipboard());
-
     /* Free child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
         FreeObject( node->elem);
     OBJ_LIST_ITERATE_END();
+
+    if ( IsObjectRoot( obj) ) {
+        free( obj);
+        return 1;
+    }
+
+    TWC_CHECKIT( obj != current_object );
+
+    RemoveObjectFromList( obj, GetClipboard());
 
     TWC_CHECKIT( obj->child_list.count == 0 );
 
@@ -128,7 +133,6 @@ int FreeObject( RT_OBJECT *obj) /* object */
     DListRemove( GetParentChildList( obj), obj->lstnode_ptr);
 
     free( obj);
-
     return 1;
 }
 
@@ -263,7 +267,7 @@ int CreateObjectWindow( RT_OBJECT *obj,         /* object */
     RECT rect;
 
     /* Determine parent HWND and MDI style */
-    parent_hwnd = (obj->parent == NULL) ? MDIClient.hwnd : obj->parent->hwnd;
+    parent_hwnd = ( IsObjectRoot( obj->parent) ) ? MDIClient.hwnd : obj->parent->hwnd;
     mdi_style = ( parent_hwnd == MDIClient.hwnd ) ? WS_EX_MDICHILD : 0;
 
     /* Make object window rect */
@@ -344,12 +348,12 @@ void SetCurrentObject( RT_OBJECT *obj) /* object */
     }
 
     /* Redraw previous object if it is not window */
-    if ( prev_obj && prev_obj->id != CTRL_ID_WINDOW ) {
+    if ( prev_obj && IsObjectControl( prev_obj) ) {
         RedrawWindow( prev_obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 
     /* Redraw current object if it is not window */
-    if ( current_object && current_object != prev_obj && current_object->id != CTRL_ID_WINDOW ) {
+    if ( current_object && current_object != prev_obj && IsObjectControl( current_object) && !IsObjectWindow( current_object) ) {
         RedrawWindow( current_object->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 

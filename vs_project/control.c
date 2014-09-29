@@ -59,6 +59,7 @@ LRESULT CALLBACK ControlWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
         case WM_NCDESTROY:
             /* Remove property and destroy static window */
             RemoveProp( hwnd, T("OBJECT_INFO"));
+            obj->hwnd = NULL;
             DestroyWindow( obj->static_hwnd);
             break;
         case WM_MOVE:

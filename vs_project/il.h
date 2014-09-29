@@ -3,7 +3,7 @@
 
 #include "project.h"
 
-int LoadProjectFromFile( TCHAR *path, TWCD_PROJECT *project, int *err_pos);
+int LoadProjectFromFile( TCHAR *path, TWCD_PROJECT **project, int *err_pos);
 int SaveProjectToFile( TWCD_PROJECT *project, TCHAR *path);
 
 #endif

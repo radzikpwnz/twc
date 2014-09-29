@@ -252,7 +252,8 @@ err:
 /**
  * Parse buffer.
  */
-static int Parse( TCHAR *buf) /* buffer */
+static int Parse( RT_OBJECT *root_obj, /* root object */
+                 TCHAR *buf)           /* buffer */
 {
 	LEX lex;
 
@@ -266,7 +267,7 @@ static int Parse( TCHAR *buf) /* buffer */
 				break;
 			}
 		} else {
-			if ( ParseObject(NULL) == 0 ) break;
+			if ( ParseObject( root_obj) == 0 ) break;
 		}
 	}
 
@@ -314,14 +315,17 @@ err:
 /**
  * Load project from file.
  */
-int LoadProjectFromFile( TCHAR *path,           /* file path */
-                         TWCD_PROJECT *project, /* (out) project */
-                         int *err_pos)          /* (out) error position */
+int LoadProjectFromFile( TCHAR *path,            /* file path */
+                         TWCD_PROJECT **project, /* (out) project */
+                         int *err_pos)           /* (out) error position */
 {
 	TCHAR *buf, *p;
 	int a = sizeof(RT_OBJECT);
+    TWCD_PROJECT *proj;
 
 	if ( err_pos ) *err_pos = 0;
+
+    proj = NewProject();
 
     /* Read file */
 	buf = LoadFile( path);
@@ -337,14 +341,14 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
 
     /* Get TWCIL version */
 	p += 6;
-	project->version.maj = _ttoi( p);
+	proj->version.maj = _ttoi( p);
 	while ( *p++ != '.' );
-	project->version.min = _ttoi( p);
+	proj->version.min = _ttoi( p);
 	while ( *p++ != '\n' );
 
     /* Parse file */
 	cur_ptr = p + _tcsspn( p, WHITESPACE);
-	if ( Parse( cur_ptr) == 0 ) {
+	if ( Parse( proj->root_object, cur_ptr) == 0 ) {
 		switch ( parse_err ) {
 			case ERR_LEXICAL:
 				if ( err_pos ) *err_pos = cur_ptr - buf;
@@ -357,8 +361,10 @@ int LoadProjectFromFile( TCHAR *path,           /* file path */
 	}
 
     /* Copy file path to project and free buffer */
-	project->path = malloc( (_tcslen( path) + 1) * sizeof(TCHAR));
-	_tcscpy( project->path, path);
+	proj->path = malloc( (_tcslen( path) + 1) * sizeof(TCHAR));
+	_tcscpy( proj->path, path);
+    *project = proj;
+
 	free( buf);
 	return 1;
 
@@ -484,12 +490,12 @@ int SaveProjectToFile( TWCD_PROJECT *project, TCHAR *path)
         return 0;
     }
 
-    if ( project->obj_list.first == NULL ) {
+    if ( GetProjectChildList( project)->first == NULL ) {
         goto ret;
     }
 	fwrite( TWCIL_HEADER, _tcslen( TWCIL_HEADER) * sizeof(TCHAR), 1, fd);
 
-	OBJ_LIST_ITERATE_BEGIN( &project->obj_list);
+	OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( project));
 		if ( WriteObjectInfo( fd, node->elem) == 0 ) {
 			buf = T("Error writing object");
 			MessageBox( hMainWnd, buf, T("Error"), 0);

@@ -14,13 +14,16 @@ TWCD_PROJECT *NewProject()
     TWCD_PROJECT *project;
     RT_OBJECT *root_obj;
 
-    project = malloc( sizeof(TWCD_PROJECT))
+    project = malloc( sizeof(TWCD_PROJECT));
 
     root_obj = (RT_OBJECT *)calloc( 1, sizeof(RT_OBJECT));
     root_obj->id = CTRL_ID_ROOT;
-    DListInit( root_obj->child_list, sizeof(PRT_OBJECT));
+    DListInit( &root_obj->child_list, sizeof(PRT_OBJECT));
 
+    project->version.maj = 1;
+    project->version.min = 0;
     project->root_object = root_obj;
+    project->path = NULL;
 
     return project;
 }
@@ -41,12 +44,21 @@ int FreeProject( TWCD_PROJECT *project)
  */
 DLIST_PRT_OBJECT *GetParentChildList( RT_OBJECT *obj) /* object */
 {
-    TWC_CHECKIT( obj->id != CTRL_ID_ROOT );
+    TWC_CHECKIT( !IsObjectRoot( obj) );
     return &obj->parent->child_list;
 }
 
+DLIST_PRT_OBJECT *GetProjectChildList( TWCD_PROJECT *project) /* project */
+{
+    TWC_CHECKIT( project != NULL);
+    TWC_CHECKIT( project->root_object != NULL);
+
+    return &project->root_object->child_list;
+}
+
+
 /**
- * Unload current project.
+ * Unload project.
  *
  * All windows are destroyed and objects freed.
  */
@@ -54,14 +66,11 @@ void UnloadCurrentProject()
 {
     SetCurrentObject( NULL);
 
-    OBJ_LIST_ITERATE_BEGIN( &cur_project.obj_list );
+    OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( cur_project));
         DestroyObjectWindow( node->elem, TWC_TRUE);
     OBJ_LIST_ITERATE_END();
 
-    if ( cur_project.path ) {
-        free(cur_project.path);
-        cur_project.path = NULL;
-    }
+    FreeProject( cur_project);
 
     SetStatusText( NULL);
     return;
@@ -74,7 +83,9 @@ void UnloadCurrentProject()
  */
 int LoadCurrentProject()
 {
-    OBJ_LIST_ITERATE_BEGIN( &cur_project.obj_list);
+    RT_OBJECT *obj;
+
+    OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( cur_project));
         if ( CreateObjectWindow( node->elem, TWC_TRUE) == 0) {
             if ( MessageBox( hMainWnd, T("Error creating one of windows! Continue loading?"), T("Error"), MB_YESNO) == IDNO ) {
                 return 0;
@@ -82,9 +93,11 @@ int LoadCurrentProject()
         }
     OBJ_LIST_ITERATE_END();
 
-    if ( cur_project.obj_list.last ) {
-        SetCurrentObject( cur_project.obj_list.last->elem );
-        SetFocus( cur_project.obj_list.last->elem->hwnd);
+    obj = GetProjectChildList( cur_project)->first->elem;
+    if ( obj != NULL ) {
+        TWC_CHECKIT( IsObjectWindow( obj) );
+        SetCurrentObject( obj);
+        SetFocus( obj->hwnd);
     }
     return 1;
 }

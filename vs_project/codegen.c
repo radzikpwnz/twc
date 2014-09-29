@@ -327,7 +327,7 @@ int GenerateProjectCode( TWCD_PROJECT *project) /* project */
     fwrite( HEADER_START, sizeof(HEADER_START) - sizeof(TCHAR), 1, fd_header);
 
     /* Write objects code */
-    OBJ_LIST_ITERATE_BEGIN( &project->obj_list);
+    OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( project));
         if ( GenerateObjectCode( node->elem) == 0 ) break;
     OBJ_LIST_ITERATE_END();
 

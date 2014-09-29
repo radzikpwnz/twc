@@ -119,10 +119,12 @@ void SetCurrentObject( RT_OBJECT *obj);
 
 
 /* If object is control (incl window) or not */
-#define IsObjectControl( obj) ( (obj)->obj_id >= CONTROL_FIRST_ID )
+#define IsObjectControl( obj) ( (obj)->id >= CONTROL_FIRST_ID )
+
+#define IsObjectWindow( obj) ( (obj)->id == CTRL_ID_WINDOW )
 
 /* If object is root */
-#define IsObjectRoot( obj) ( (obj)->obj_id == CTRL_ID_ROOT )
+#define IsObjectRoot( obj) ( (obj)->id == CTRL_ID_ROOT )
 
 /* If object is undefined */
-#define IsObjectUndefined( obj) ( (obj)->obj_id == CTRL_ID_UNDEFINED )
+#define IsObjectUndefined( obj) ( (obj)->id == CTRL_ID_UNDEFINED )

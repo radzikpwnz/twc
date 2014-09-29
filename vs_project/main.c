@@ -6,9 +6,6 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #define _USE_MATH_DEFINES
 
-#include <windows.h>
-#include <commctrl.h>
-
 #include "twc_design.h"
 
 #include "win_stuff.h"
@@ -21,6 +18,7 @@ processorArchitecture='*' publicKeyToken='6595b64144ccf1df' language='*'\"")
 #include "mainwnd.h"
 #include "window.h"
 #include "static.h"
+#include "project.h"
 
 /*
 #define VLD_FORCE_ENABLE
@@ -129,7 +127,8 @@ static int Init()
     /* Show main window */
     ShowWindow( hMainWnd, SW_SHOWNORMAL);
 	UpdateWindow( hMainWnd);
-	SetStatusText( T("Ready!"));
+
+    actNewProject();
 
     return 1;
 }
