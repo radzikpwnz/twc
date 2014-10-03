@@ -110,7 +110,7 @@ static int GetObjectNameLen( RT_OBJECT *obj) /* object */
 {
     int len = 0;
 
-    if ( obj->parent != NULL) {
+    if ( !IsObjectRoot( obj->parent) ) {
         len += GetObjectNameLen( obj->parent) + 1;
     }
     len += _tcslen( obj->name);
@@ -127,7 +127,7 @@ static TCHAR *PrintObjectName( TCHAR *buf,     /* buffer */
     TCHAR *p;
 
     p = buf;
-    if ( obj->parent != NULL ) {
+    if ( !IsObjectRoot( obj->parent) ) {
         p = PrintObjectName( p, obj->parent);
         *p++ = '_';
     }

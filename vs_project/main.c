@@ -125,7 +125,7 @@ static int Init()
 	AddMainToolbarButtons(MainToolbar.hwnd);
 
     /* Show main window */
-    ShowWindow( hMainWnd, SW_SHOWNORMAL);
+    ShowWindow( hMainWnd, SW_SHOWMAXIMIZED);
 	UpdateWindow( hMainWnd);
 
     actNewProject();

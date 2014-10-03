@@ -19,8 +19,8 @@ int _CreateObjectWindow( RT_OBJECT *obj,         /* object */
 }
 
 
-int MoveObjectWindow();
-int SizeObjectWindow();
+int _MoveObjectWindow();
+int _SizeObjectWindow();
 
-int CALLBACK PaintObjectWindow();
+int CALLBACK _PaintObjectWindow();
 

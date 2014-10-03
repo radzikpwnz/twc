@@ -294,10 +294,26 @@ void actNewProject()
     return;
 }
 
+void Test()
+{
+    int i;
+
+    for ( i = 0; i < 1000; i++ ) {
+        UnloadCurrentProject();
+        LoadProjectFromFile( T("D:\\git\\twc\\vs_project\\TWC Projects\\nc_client.twcp"), &cur_project, NULL);
+        LoadCurrentProject();
+    }
+
+    return;
+}
+
 void actOpenProject()
 {
     TCHAR *buf;
     int ret;
+
+    Test();
+    return;
 
     if ( AskForSave() == 0 ) {
         return;
@@ -350,7 +366,7 @@ void actPreview()
         return;
     }
     obj = current_object;
-    while ( obj->parent ) obj = obj->parent;
+    while ( !IsObjectRoot( obj->parent)  ) obj = obj->parent;
     PreviewWindow( obj, hMainWnd);
     return;
 }

@@ -64,6 +64,10 @@ DLIST_PRT_OBJECT *GetProjectChildList( TWCD_PROJECT *project) /* project */
  */
 void UnloadCurrentProject()
 {
+    if ( cur_project == NULL ) {
+        return;
+    }
+
     SetCurrentObject( NULL);
 
     OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( cur_project));
