@@ -34,6 +34,7 @@ int FreeProject( TWCD_PROJECT *project)
 {
     FreeObject( project->root_object);
     free( project->path);
+    free( project);
     return 1;
 }
 

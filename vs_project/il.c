@@ -140,15 +140,12 @@ static LEX_ID GetLex( LEX *lex) /* (out) lexeme */
 			p1 = p;
 			p1 += _tcscspn(p1, T("\"\n\t\r"));
 			if (*p1 != '\"') goto ret;
+
 			len = p1 - p;
 			lex->id = LEX_STRVAL;
-			/*if (len == 0) {
-				lex->val.s = NULL;
-			} else {*/
-            lex->val.s = malloc((len + 1) * sizeof(TCHAR));
-			_tcsncpy(lex->val.s, p, len);
-			*((TCHAR *)lex->val.s + len) = '\0';
-			//}
+            lex->val.s = p;
+			*(lex->val.s + len) = '\0';
+
 			p1++;
 			p = p1 + _tcsspn(p1, WHITESPACE);
 		} else if (*p >= '0' && *p <= '9') { //Integer value

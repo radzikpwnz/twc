@@ -298,9 +298,9 @@ void Test()
 {
     int i;
 
-    for ( i = 0; i < 1000; i++ ) {
+    for ( i = 0; i < 100; i++ ) {
         UnloadCurrentProject();
-        LoadProjectFromFile( T("D:\\git\\twc\\vs_project\\TWC Projects\\nc_client.twcp"), &cur_project, NULL);
+        LoadProjectFromFile( T("C:\\git\\twc\\vs_project\\TWC Projects\\nc_client.twcp"), &cur_project, NULL);
         LoadCurrentProject();
     }
 
