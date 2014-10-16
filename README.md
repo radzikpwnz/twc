@@ -1,4 +1,3 @@
-twc
-===
-
-TWC Design and stuff
+TWC
+=====
+Tiny Window Creator (GUI designer for windows)

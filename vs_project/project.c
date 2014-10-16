@@ -76,6 +76,7 @@ void UnloadCurrentProject()
     OBJ_LIST_ITERATE_END();
 
     FreeProject( cur_project);
+    cur_project = NULL;
 
     SetStatusText( NULL);
     return;
@@ -104,5 +105,6 @@ int LoadCurrentProject()
         SetCurrentObject( obj);
         SetFocus( obj->hwnd);
     }
+
     return 1;
 }
