@@ -312,8 +312,8 @@ void actOpenProject()
     TCHAR *buf;
     int ret;
 
-    Test();
-    return;
+    /*Test();
+    return;*/
 
     if ( AskForSave() == 0 ) {
         return;

@@ -103,6 +103,8 @@ int FreeObject( RT_OBJECT *obj) /* object */
         return 1;
     }
 
+    TWC_CHECKIT( obj->hwnd == NULL );
+
     /* Free child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
         FreeObject( node->elem);
