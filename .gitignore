@@ -1,7 +1,8 @@
-vs_project/TWC Design.ncb
+*.aps
+*.suo
 *.user
-vs_project/Release/
-property_list/Release/
-property_list/proplist.ncb
-vs_project/proplist.dll
-untracked/
+*.ncb
+*.dll
+[Rr]elease*/
+[Dd]ebug*/
+*.vcproj
