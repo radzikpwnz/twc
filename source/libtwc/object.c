@@ -34,8 +34,8 @@ TWC_OBJECT *twc_NewObject( UINT ctrl_id) /* control ID */
     obj->id = ctrl_id;
     if ( ctrl_id >= CONTROL_FIRST_ID ) {
         /* Alloc memory for properties */
-        obj->classname = GetControlClassname( ctrl_id);
-        obj->properties = (PROPERTY *)calloc( 1, GetControlPropertiesCount( ctrl_id) * sizeof(PROPERTY));
+        obj->classname = twc_GetControlClassname( ctrl_id);
+        obj->properties = (PROPERTY *)calloc( 1, twc_GetControlPropertiesCount( ctrl_id) * sizeof(PROPERTY));
     }
 
     return obj;
@@ -66,21 +66,21 @@ TWC_OBJECT *twc_CopyObject( TWC_OBJECT *obj,    /* object to copy */
     new_obj->orig_wndproc = NULL;
     
     /* Copy properties */
-    prop_count = GetControlPropertiesCount( obj->id);
+    prop_count = twc_GetControlPropertiesCount( obj->id);
     new_obj->properties = malloc( prop_count * sizeof(PROPERTY));
     memcpy( new_obj->properties, obj->properties, prop_count * sizeof(PROPERTY));
 
     /* Copy strings for string properties */
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
-        propinfo = GetPropertyInfo( obj->id, prop_id);
-        val = GetObjectPropertyVal( new_obj, prop_id);
+        propinfo = twc_GetPropertyInfo( obj->id, prop_id);
+        val = twc_GetObjectPropertyVal( new_obj, prop_id);
         if ( propinfo->type == T_STR ) {
             SetString( &(val->s), val->s, 1);
         }
     }
 
     /* Make title point to title property value */
-    new_obj->title = GetObjectPropertyVal( new_obj, COMMON_TITLE)->s;
+    new_obj->title = twc_GetObjectPropertyVal( new_obj, COMMON_TITLE)->s;
 
     /* Add object to parent's child list */
     new_obj->lstnode_ptr = DListAdd( twc_GetParentChildList( new_obj), (void *)-1, &new_obj);
@@ -115,11 +115,11 @@ int twc_FreeObject( TWC_OBJECT *obj) /* object */
     TWC_CHECKIT( obj->child_list.count == 0 );
 
     /* Free string values of properties */
-    prop_count = GetControlPropertiesCount( obj->id);
+    prop_count = twc_GetControlPropertiesCount( obj->id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
-        propinfo = GetPropertyInfo( obj->id, prop_id);
+        propinfo = twc_GetPropertyInfo( obj->id, prop_id);
         if ( propinfo->type == T_STR ) {
-            free( GetObjectPropertyVal( obj, prop_id)->s);
+            free( twc_GetObjectPropertyVal( obj, prop_id)->s);
         }
     }
     free( obj->properties);
@@ -140,7 +140,7 @@ int twc_FreeObject( TWC_OBJECT *obj) /* object */
 void twc_PrepareObject( TWC_OBJECT *obj) /* object */
 {
     /* Load defaults for all properties */
-    SetObjectPropertyDefaultValue( obj, PROPERTIES_ALL);
+    twc_SetObjectPropertyDefaultValue( obj, PROPERTIES_ALL);
 
     /* Set styles, witch not covered by properties */
     if ( obj->id == CTRL_ID_WINDOW ) {
@@ -288,8 +288,8 @@ static LRESULT CALLBACK ObjectWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARA
             /* Write new values to properties */
 			GetWindowRect( hwnd, &rect);
 			MapWindowPoints( HWND_DESKTOP, GetParent(hwnd), (POINT *)&rect, 1);
-			SetObjectPropertyInt(obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
-            SetObjectPropertyInt(obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
+			twc_SetObjectPropertyInt(obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
+            twc_SetObjectPropertyInt(obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
 			break;
 		case WM_SIZE:
             /* Write new values to properties */
@@ -298,8 +298,8 @@ static LRESULT CALLBACK ObjectWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARA
             } else {
                 GetWindowRect( hwnd, &rect);
             }
-			SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
-			SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
+			twc_SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
+			twc_SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
 			break;
     }
 

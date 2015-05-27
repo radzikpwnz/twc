@@ -67,7 +67,7 @@ static int RegisterWindowClasses()
 	/* Default Window */
 	wincl.style = CS_DBLCLKS;
 	wincl.lpszMenuName = NULL;
-	wincl.lpszClassName = GetControlClassname( CTRL_ID_WINDOW);
+	wincl.lpszClassName = twc_GetControlClassname( CTRL_ID_WINDOW);
 	wincl.lpfnWndProc = DefWindowProc;
 	if ( !RegisterClassEx( &wincl) ) return 0;
 

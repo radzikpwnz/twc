@@ -7,6 +7,7 @@
 #include "static.h"
 #include "project.h"
 #include "clipboard.h"
+#include "properties.h"
 
 #include "object.h"
 
@@ -27,7 +28,7 @@ TWC_OBJECT *CopyObject( TWC_OBJECT *obj,    /* object to copy */
     
     /* Generate object name and make title point to title property value */
     GenerateObjectName( new_obj);
-    new_obj->title = GetObjectPropertyVal( new_obj, COMMON_TITLE)->s;
+    new_obj->title = twc_GetObjectPropertyVal( new_obj, COMMON_TITLE)->s;
 
     return new_obj;
 }
@@ -88,7 +89,7 @@ static int CreateStaticOnControl( TWC_OBJECT *obj) /* object */
 {
     HWND hwnd;
 
-    TWC_CHECKIT( obj->id != CTRL_ID_WINDOW );
+    TWC_CHECKIT( IsObjectControl( obj) );
 
     hwnd = CreateWindowEx( 0, WC_STATIC, NULL, WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS, obj->x, obj->y, obj->width, obj->height,
                            obj->parent->hwnd, NULL, GetModuleHandle(NULL), 0);
@@ -108,13 +109,25 @@ static int CreateStaticOnControl( TWC_OBJECT *obj) /* object */
 }
 
 /**
+ * Object initialization after it's been created.
+ */
+static int InitObjectAfterCreation( TWC_OBJECT *obj) /* object */
+{    
+    obj->client_wndproc = ( IsObjectWindow( obj) ) ? ChildWndProc : ControlWndProc;
+
+    if ( !IsObjectWindow( obj) ) {
+        CreateStaticOnControl( obj);
+    }
+
+    return 1;
+}
+
+/**
  * Create object window.
  */
 int CreateObjectWindow( TWC_OBJECT *obj,        /* object */
                         TWC_BOOL create_childs) /* TWC_TRUE for create childs */
 {
-    RECT rect;
-
     /* Determine parent HWND and MDI style */
     if ( IsObjectRoot( obj->parent) ) {
         obj->parent->hwnd = MDIClient.hwnd;
@@ -122,7 +135,7 @@ int CreateObjectWindow( TWC_OBJECT *obj,        /* object */
     }
 
     twc_CreateObjectWindow( obj, TWC_FALSE, NULL);
-    CreateStaticOnControl( obj);
+    InitObjectAfterCreation( obj);
 
     if ( create_childs ) {
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);

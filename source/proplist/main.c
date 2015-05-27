@@ -105,7 +105,7 @@ __declspec(dllexport) int InitPropertyListDll(HINSTANCE hInstance)
 	return 1;
 }
 
-__declspec(dllexport) TCHAR *GetPropListClassname()
+__declspec(dllexport) const TCHAR *GetPropListClassname()
 {
 	return proplist_class.lpszClassName;
 }
@@ -131,7 +131,7 @@ LRESULT CALLBACK MainWindowProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 	CREATESTRUCT *cs;
 	ITEM newitem;
 	DLIST_NODE_ITEM *node;
-	TCHAR buf[64], *p, **pp;
+	TCHAR buf[64], **pp;
 	int i;
 	static int yPos;
 	SCROLLINFO si;
@@ -417,7 +417,7 @@ LRESULT CALLBACK MainWindowProc (HWND hwnd, UINT msg, WPARAM wParam, LPARAM lPar
 
 int ProcessChangedItem(OBJECT *obj, ITEM *item)
 {
-	TCHAR buf[64], *p;
+	TCHAR buf[64];
 	int i;
 
 	if (item == NULL) return 0;

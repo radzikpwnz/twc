@@ -1,5 +1,7 @@
 #include "twc_design.h"
 
+#include "proplst.h"
+
 #include "properties.h"
 
 
@@ -18,7 +20,7 @@ int GenerateObjectName( TWC_OBJECT *obj) /* object */
     TCHAR *default_name;
 
     /* Get default object name */
-    default_name = GetControlDefaultObjectName( obj->id);
+    default_name = twc_GetControlDefaultObjectName( obj->id);
 	ok = 0;
 
     /* Add number after default name until it become unique */
@@ -127,4 +129,54 @@ int PropertyFilter( TWC_OBJECT *obj, /* object */
 	}
 
 	return PF_OK;
+}
+
+/**
+ * Set object property integer value.
+ */
+int SetObjectPropertyInt( TWC_OBJECT *obj, /* object */
+                          UINT prop_id,    /* property ID */
+                          int val,         /* new value */
+                          TWC_BOOL update, /* update property? */
+                          TWC_BOOL apply)  /* apply property? */
+{
+    VALUE value;
+
+    value.i = val;
+    return SetObjectProperty( obj, prop_id, &value, update, apply);
+}
+
+/**
+ * Set object property string value.
+ */
+int SetObjectPropertyStr( TWC_OBJECT *obj,  /* object */
+                          UINT prop_id,     /* property ID */
+                          const TCHAR *val, /* new value */
+                          TWC_BOOL update,  /* update property? */
+                          TWC_BOOL apply)   /* apply property? */
+{
+    VALUE value;
+
+    value.s = (TCHAR *)val;
+    return SetObjectProperty( obj, prop_id, &value, update, apply);
+}
+
+/**
+ * Set object property value.
+ */
+int SetObjectProperty( TWC_OBJECT *obj,      /* object */
+                       UINT prop_id,         /* property ID */
+                       const VALUE *new_val, /* new value */
+                       TWC_BOOL update,      /* update property? */
+                       TWC_BOOL apply)       /* apply property? */
+{
+    twc_SetObjectProperty( obj, prop_id, new_val, update, apply);
+
+    /* If object is current, update property in property list */
+    if ( obj == current_object ) {
+        TWC_CHECKIT( obj->hwnd != NULL );
+        UpdateSingleListProperty( hPropList, obj, prop_id, twc_GetObjectPropertyVal( obj, prop_id));
+    }
+
+	return 1;
 }

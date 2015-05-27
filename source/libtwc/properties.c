@@ -89,9 +89,9 @@ static int UpdateObjectPropertyInternal( TWC_OBJECT *obj, /* object */
     PROPERTY *prop;
 
     /* Get property info and property */
-    propinfo = GetPropertyInfo( obj->id, prop_id);
+    propinfo = twc_GetPropertyInfo( obj->id, prop_id);
 	act = &(propinfo->on_set_act);
-    prop = GetObjectProperty( obj, prop_id);
+    prop = twc_GetObjectProperty( obj, prop_id);
 
     obj->style &= ~(act->style_to_remove);
     obj->style &= ~(act->exstyle_to_remove);
@@ -134,7 +134,7 @@ static int UpdateObjectProperty( TWC_OBJECT *obj, /* object */
     TWC_CHECKIT( prop_id != PROPERTY_UNDEFINED );
 
     if ( prop_id == PROPERTIES_ALL ) {
-        prop_count = GetControlPropertiesCount( obj->id);
+        prop_count = twc_GetControlPropertiesCount( obj->id);
         for ( i = 0; i < prop_count; i++ ) {
             UpdateObjectPropertyInternal( obj, i, TWC_FALSE);
         }
@@ -180,11 +180,11 @@ static TWC_BOOL IsValuesEQ( const VALUE *val1, /* value 1 */
 /**
  * Get object property.
  */
-PROPERTY *GetObjectProperty( TWC_OBJECT *obj, /* object */
-                             UINT prop_id)    /* property ID */
+PROPERTY *twc_GetObjectProperty( TWC_OBJECT *obj, /* object */
+                                 UINT prop_id)    /* property ID */
 {
     TWC_CHECKIT( prop_id != PROPERTIES_ALL);
-    TWC_CHECKIT( prop_id < GetControlPropertiesCount( obj->id) );
+    TWC_CHECKIT( prop_id < twc_GetControlPropertiesCount( obj->id) );
 
 	return &obj->properties[prop_id];
 }
@@ -192,65 +192,65 @@ PROPERTY *GetObjectProperty( TWC_OBJECT *obj, /* object */
 /**
  * Get object property value.
  */
-VALUE *GetObjectPropertyVal( TWC_OBJECT *obj, /* object */
-                             int prop_id)     /* property ID */
+VALUE *twc_GetObjectPropertyVal( TWC_OBJECT *obj, /* object */
+                                 int prop_id)     /* property ID */
 {
-    return &GetObjectProperty(obj, prop_id)->val;
+    return &twc_GetObjectProperty(obj, prop_id)->val;
 }
 
 /**
  * Get object property flags.
  */
-UINT GetObjectPropertyFlags( TWC_OBJECT *obj, /* object */
-                             int prop_id)     /* property ID */
+UINT twc_GetObjectPropertyFlags( TWC_OBJECT *obj, /* object */
+                                 int prop_id)     /* property ID */
 {
-    return GetObjectProperty(obj, prop_id)->flags;
+    return twc_GetObjectProperty(obj, prop_id)->flags;
 }
 
 /**
  * Set object property integer value.
  */
-int SetObjectPropertyInt( TWC_OBJECT *obj, /* object */
-                          UINT prop_id,    /* property ID */
-                          int val,         /* new value */
-                          TWC_BOOL update, /* update property? */
-                          TWC_BOOL apply)  /* apply property? */
+int twc_SetObjectPropertyInt( TWC_OBJECT *obj, /* object */
+                              UINT prop_id,    /* property ID */
+                              int val,         /* new value */
+                              TWC_BOOL update, /* update property? */
+                              TWC_BOOL apply)  /* apply property? */
 {
     VALUE value;
 
     value.i = val;
-    return SetObjectProperty( obj, prop_id, &value, update, apply);
+    return twc_SetObjectProperty( obj, prop_id, &value, update, apply);
 }
 
 /**
  * Set object property string value.
  */
-int SetObjectPropertyStr( TWC_OBJECT *obj,  /* object */
-                          UINT prop_id,     /* property ID */
-                          const TCHAR *val, /* new value */
-                          TWC_BOOL update,  /* update property? */
-                          TWC_BOOL apply)   /* apply property? */
+int twc_SetObjectPropertyStr( TWC_OBJECT *obj,  /* object */
+                              UINT prop_id,     /* property ID */
+                              const TCHAR *val, /* new value */
+                              TWC_BOOL update,  /* update property? */
+                              TWC_BOOL apply)   /* apply property? */
 {
     VALUE value;
 
     value.s = (TCHAR *)val;
-    return SetObjectProperty( obj, prop_id, &value, update, apply);
+    return twc_SetObjectProperty( obj, prop_id, &value, update, apply);
 }
 
 /**
  * Set object property value.
  */
-int SetObjectProperty( TWC_OBJECT *obj,      /* object */
-                       UINT prop_id,         /* property ID */
-                       const VALUE *new_val, /* new value */
-                       TWC_BOOL update,      /* update property? */
-                       TWC_BOOL apply)       /* apply property? */
+int twc_SetObjectProperty( TWC_OBJECT *obj,      /* object */
+                           UINT prop_id,         /* property ID */
+                           const VALUE *new_val, /* new value */
+                           TWC_BOOL update,      /* update property? */
+                           TWC_BOOL apply)       /* apply property? */
 {
 	PROPERTY_INFO *propinfo;
 	PROPERTY *prop;
 
-	propinfo = GetPropertyInfo(obj->id, prop_id);
-    prop = GetObjectProperty( obj, prop_id);
+	propinfo = twc_GetPropertyInfo(obj->id, prop_id);
+    prop = twc_GetObjectProperty( obj, prop_id);
 
     TWC_CHECKIT( !(propinfo->type == T_STR && new_val->s == NULL) );
 
@@ -291,8 +291,8 @@ int SetObjectProperty( TWC_OBJECT *obj,      /* object */
 /**
  * Set default value to property or all properties.
  */
-int SetObjectPropertyDefaultValue( TWC_OBJECT *obj, /* object */
-                                   UINT prop_id)    /* property ID */
+int twc_SetObjectPropertyDefaultValue( TWC_OBJECT *obj, /* object */
+                                       UINT prop_id)    /* property ID */
 {
     int prop_count;
     int i;
@@ -301,14 +301,14 @@ int SetObjectPropertyDefaultValue( TWC_OBJECT *obj, /* object */
     TWC_CHECKIT( obj != NULL );
 
     if ( prop_id == PROPERTIES_ALL ) {
-        prop_count = GetControlPropertiesCount( obj->id);
+        prop_count = twc_GetControlPropertiesCount( obj->id);
         for ( i = 0; i < prop_count; i++ ) {
-            propinfo = GetPropertyInfo( obj->id, i);
-            SetObjectProperty( obj, i, &(propinfo->default_caption), TWC_TRUE, TWC_FALSE);
+            propinfo = twc_GetPropertyInfo( obj->id, i);
+            twc_SetObjectProperty( obj, i, &(propinfo->default_caption), TWC_TRUE, TWC_FALSE);
         }
     } else {
-        propinfo = GetPropertyInfo( obj->id, prop_id);
-        SetObjectProperty( obj, prop_id, &(propinfo->default_caption), TWC_TRUE, TWC_FALSE);
+        propinfo = twc_GetPropertyInfo( obj->id, prop_id);
+        twc_SetObjectProperty( obj, prop_id, &(propinfo->default_caption), TWC_TRUE, TWC_FALSE);
     }
 
     return 1;

@@ -36,7 +36,7 @@ int UpdateSingleListProperty(HWND hPropList, TWC_OBJECT *obj, UINT prop_id, cons
 
 	iteminfo.id = prop_id;
 
-    InitItemInfoByValue( &iteminfo, val, GetPropertyInfo( obj->id, prop_id)->type);
+    InitItemInfoByValue( &iteminfo, val, twc_GetPropertyInfo( obj->id, prop_id)->type);
 
 	SendMessage(hPropList, PL_SETITEMVALUE, (WPARAM)&iteminfo, 0);
 	return 1;
@@ -48,8 +48,8 @@ static int AddSingleProperty(HWND hPropList, TWC_OBJECT *obj, UINT prop_id)
     PROPERTY_INFO *propinfo;
     VALUE *val;
     
-    propinfo = GetPropertyInfo( obj->id, prop_id);
-    val = GetObjectPropertyVal( obj, prop_id);
+    propinfo = twc_GetPropertyInfo( obj->id, prop_id);
+    val = twc_GetObjectPropertyVal( obj, prop_id);
 
 	iteminfo.name = propinfo->dname;
 	iteminfo.id = prop_id;
@@ -80,7 +80,7 @@ int LoadPropertyList(HWND hPropList, TWC_OBJECT *obj)
 
 	SendMessage( hPropList, PL_STARTFILL, 0, 0);
 
-    prop_count = GetControlPropertiesCount( obj->id);
+    prop_count = twc_GetControlPropertiesCount( obj->id);
 
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
         AddSingleProperty( hPropList, obj, prop_id);

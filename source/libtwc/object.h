@@ -15,7 +15,7 @@ enum {
     OBJ_FLAG_CLIENTSIZE = 1 << 0 /* use client size instead window size */
 };
 
-typedef LRESULT (TWC_CLIENTPROC)(TWC_OBJECT *, UINT, WPARAM, LPARAM);
+typedef LRESULT (CALLBACK* TWC_CLIENTPROC)(TWC_OBJECT*, UINT, WPARAM, LPARAM);
 
 typedef UINT CLIENT_DATA;
 
@@ -35,7 +35,7 @@ struct tagTWC_OBJECT {
     TCHAR *classname;                   /* class name */
     HWND hwnd;                          /* object window HWND */          
     WNDPROC orig_wndproc;               /* original window procedure */
-    TWC_CLIENTPROC *client_wndproc;     /* client window procedure */
+    TWC_CLIENTPROC client_wndproc;      /* client window procedure */
 
     DWORD style;                        /* style and extended style */
     DWORD exstyle;

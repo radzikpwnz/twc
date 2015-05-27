@@ -19,7 +19,7 @@ TWC_OBJECT *CreateControlFromToolbox( TWC_OBJECT *cur_wnd, int x, int y);
 /**
  * Control window procedure.
  */
-LRESULT CALLBACK ControlWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+LRESULT CALLBACK ControlWndProc( TWC_OBJECT *obj, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #elif defined( linux)
 

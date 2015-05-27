@@ -3,6 +3,7 @@
 #include "twc_design.h"
 
 #include "toolbox.h"
+#include "properties.h"
 
 #include "control.h"
 
@@ -48,26 +49,22 @@ TWC_OBJECT *CreateControlFromToolbox( TWC_OBJECT *cur_wnd, /* parent window obje
 /**
  * Control window procedure.
  */
-LRESULT CALLBACK ControlWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ControlWndProc( TWC_OBJECT *obj, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    TWC_OBJECT *obj;
     RECT rect;
-
-    obj = GetProp( hwnd, T("OBJECT_INFO"));
+    HWND hwnd = obj->hwnd;
 
     switch ( msg ) {
         case WM_NCDESTROY:
-            /* Remove property and destroy static window */
-            RemoveProp( hwnd, T("OBJECT_INFO"));
-            obj->hwnd = NULL;
+            /* Destroy static window */
             DestroyWindow( OBJ_CLIENT_DATA( obj)->static_hwnd);
             break;
         case WM_MOVE:
             /* Write new values to properties */
 			GetWindowRect( hwnd, &rect);
 			MapWindowPoints( HWND_DESKTOP, GetParent(hwnd), (POINT *)&rect, 1);
-			SetObjectPropertyInt(obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
-            SetObjectPropertyInt(obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
+			SetObjectPropertyInt( obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
+            SetObjectPropertyInt( obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
 
             /* Move static window */
             SetWindowPos( OBJ_CLIENT_DATA( obj)->static_hwnd, NULL, rect.left, rect.top, 0, 0, SWP_NOSIZE | SWP_NOZORDER);

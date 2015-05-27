@@ -482,20 +482,20 @@ enum TOOLBAR_PROPERTIES {
 
 
 
-EXPORT CONTROL_INFO *GetControlInfo( UINT ctrl_id);
+EXPORT CONTROL_INFO *twc_GetControlInfo( UINT ctrl_id);
 
-EXPORT PROPERTY_INFO *GetPropertyInfo( UINT ctrl_id, UINT prop_id);
+EXPORT PROPERTY_INFO *twc_GetPropertyInfo( UINT ctrl_id, UINT prop_id);
 
-EXPORT UINT GetControlPropertiesCount( UINT ctrl_id);
+EXPORT UINT twc_GetControlPropertiesCount( UINT ctrl_id);
 
-EXPORT TCHAR *GetControlClassname( UINT ctrl_id);
+EXPORT TCHAR *twc_GetControlClassname( UINT ctrl_id);
 
-EXPORT TCHAR *GetControlClassnameTWC( UINT ctrl_id);
+EXPORT TCHAR *twc_GetControlClassnameTWC( UINT ctrl_id);
 
-EXPORT TCHAR *GetControlDefaultObjectName( UINT ctrl_id);
+EXPORT TCHAR *twc_GetControlDefaultObjectName( UINT ctrl_id);
 
-EXPORT PROP_CODEGEN_CUSTOM_ACT_FUNC GetControlCodegenCustomAct( UINT ctrl_id);
+EXPORT PROP_CODEGEN_CUSTOM_ACT_FUNC twc_GetControlCodegenCustomAct( UINT ctrl_id);
 
-EXPORT UINT GetPropertyIdByName( TCHAR *name, UINT ctrl_id);
+EXPORT UINT twc_GetPropertyIdByName( TCHAR *name, UINT ctrl_id);
 
 #endif

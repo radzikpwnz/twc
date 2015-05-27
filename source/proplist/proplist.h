@@ -42,7 +42,7 @@ typedef struct tagPL_ITEMINFO {
 
 #ifndef PROPLIST_DLL
 int InitPropertyListDll(HINSTANCE hInstance);
-TCHAR *GetPropListClassname();
+const TCHAR *GetPropListClassname();
 #endif
 
 

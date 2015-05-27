@@ -15,4 +15,8 @@ int GenerateObjectName( TWC_OBJECT *obj);
 int StyleFilter( TWC_OBJECT *obj);
 int PropertyFilter( TWC_OBJECT *obj, int prop_id, VALUE *val);
 
+int SetObjectProperty( TWC_OBJECT *obj, UINT prop_id, const VALUE *new_val, TWC_BOOL update, TWC_BOOL apply);
+int SetObjectPropertyInt( TWC_OBJECT *obj, UINT prop_id, int val, TWC_BOOL update, TWC_BOOL apply);
+int SetObjectPropertyStr( TWC_OBJECT *obj, UINT prop_id, const TCHAR *val, TWC_BOOL update, TWC_BOOL apply);
+
 #endif

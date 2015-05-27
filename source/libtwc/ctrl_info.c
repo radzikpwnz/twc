@@ -66,22 +66,22 @@ static void PropOnSetCustomAction_Common( TWC_OBJECT *obj, UINT prop_id)
 {
     switch ( prop_id ) {
         case COMMON_NAME:
-            obj->name = GetObjectPropertyVal( obj, prop_id)->s;
+            obj->name = twc_GetObjectPropertyVal( obj, prop_id)->s;
             break;
         case COMMON_X:
-            obj->x = GetObjectPropertyVal( obj, prop_id)->i;
+            obj->x = twc_GetObjectPropertyVal( obj, prop_id)->i;
             break;
         case COMMON_Y:
-            obj->y = GetObjectPropertyVal( obj, prop_id)->i;
+            obj->y = twc_GetObjectPropertyVal( obj, prop_id)->i;
             break;
         case COMMON_WIDTH:
-            obj->width = GetObjectPropertyVal( obj, prop_id)->i;
+            obj->width = twc_GetObjectPropertyVal( obj, prop_id)->i;
             break;
         case COMMON_HEIGHT:
-            obj->height = GetObjectPropertyVal( obj, prop_id)->i;
+            obj->height = twc_GetObjectPropertyVal( obj, prop_id)->i;
             break;
         case COMMON_TITLE:
-            obj->title = GetObjectPropertyVal( obj, prop_id)->s;
+            obj->title = twc_GetObjectPropertyVal( obj, prop_id)->s;
             break;
     }
 
@@ -94,14 +94,14 @@ static void PropCodegenCustomAction_Common( TWC_OBJECT *obj, UINT prop_id, TCHAR
 
     switch ( prop_id ) {
         case COMMON_CUSTOMSTYLE:
-	        val = GetObjectPropertyVal( obj, COMMON_CUSTOMSTYLE);
+	        val = twc_GetObjectPropertyVal( obj, COMMON_CUSTOMSTYLE);
             if ( val->s[0] != T('\0') ) {
                 *style = _mytcscpy( *style, val->s);
                 *style = _mytcscpy( *style, _T(" | "));
             }
             break;
         case COMMON_CUSTOMEXSTYLE:
-            val = GetObjectPropertyVal( obj, COMMON_CUSTOMEXSTYLE);
+            val = twc_GetObjectPropertyVal( obj, COMMON_CUSTOMEXSTYLE);
             if ( val->s[0] != T('\0') ) {
                 *exstyle = _mytcscpy( *exstyle, val->s);
                 *exstyle = _mytcscpy( *exstyle, _T(" | "));
@@ -174,19 +174,19 @@ void PropOnSetCustomAction_Window( TWC_OBJECT *obj, UINT prop_id)
 
     switch ( prop_id ) {
         case WINDOW_CLIENTSIZE:
-            val = GetObjectPropertyVal( obj, prop_id);
+            val = twc_GetObjectPropertyVal( obj, prop_id);
             if ( val->i == 0 ) {
                 if ( obj->hwnd != NULL ) {
                     GetWindowRect( obj->hwnd, &rect);
-                    SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
-                    SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
+                    twc_SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
+                    twc_SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
                 }
                 obj->flags &= ~OBJ_FLAG_CLIENTSIZE;
             } else {
                 if ( obj->hwnd != NULL ) {
                     GetClientRect( obj->hwnd, &rect);
-                    SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
-                    SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
+                    twc_SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
+                    twc_SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
                 }
                 obj->flags |= OBJ_FLAG_CLIENTSIZE;
             }
@@ -226,17 +226,17 @@ static void PropOnSetCustomAction_Button( TWC_OBJECT *obj, UINT prop_id)
         case CTRL_ID_BUTTON:
             break;
         case CTRL_ID_CHECKBOX:
-			val = GetObjectPropertyVal( obj, CHK_AUTO);
+			val = twc_GetObjectPropertyVal( obj, CHK_AUTO);
             if (val->i == 1) {
-				val = GetObjectPropertyVal( obj, CHK_3STATE);
+				val = twc_GetObjectPropertyVal( obj, CHK_3STATE);
                 obj->style |= ( val->i == 1 ) ? BS_AUTO3STATE : BS_AUTOCHECKBOX;
 			} else {
-				val = GetObjectPropertyVal( obj, CHK_3STATE);
+				val = twc_GetObjectPropertyVal( obj, CHK_3STATE);
                 obj->style |= ( val->i == 1) ? BS_3STATE : BS_CHECKBOX;
 			}
             break;
         case CTRL_ID_RADIOBUTTON:
-            val = GetObjectPropertyVal( obj, RADIO_AUTO);
+            val = twc_GetObjectPropertyVal( obj, RADIO_AUTO);
 			obj->style |= ( val->i == 1 ) ? BS_AUTORADIOBUTTON : BS_RADIOBUTTON;
             break;
         case CTRL_ID_GROUPBOX:
@@ -256,18 +256,18 @@ static void PropCodegenCustomAction_Button( TWC_OBJECT *obj, UINT prop_id, TCHAR
         case CTRL_ID_BUTTON:
             break;
         case CTRL_ID_CHECKBOX:
-			val = GetObjectPropertyVal( obj, CHK_AUTO);
+			val = twc_GetObjectPropertyVal( obj, CHK_AUTO);
             if (val->i == 1) {
-				val = GetObjectPropertyVal( obj, CHK_3STATE);
+				val = twc_GetObjectPropertyVal( obj, CHK_3STATE);
                 *style = _mytcscpy( *style, ( val->i == 1 ) ? T("BS_AUTO3STATE") : T("BS_AUTOCHECKBOX"));
 			} else {
-				val = GetObjectPropertyVal( obj, CHK_3STATE);
+				val = twc_GetObjectPropertyVal( obj, CHK_3STATE);
                 *style = _mytcscpy( *style, ( val->i == 1 ) ? T("BS_3STATE") : T("BS_CHECKBOX"));
 			}
             *style = _mytcscpy( *style, _T(" | "));
             break;
         case CTRL_ID_RADIOBUTTON:
-            val = GetObjectPropertyVal( obj, RADIO_AUTO);
+            val = twc_GetObjectPropertyVal( obj, RADIO_AUTO);
             *style = _mytcscpy( *style, ( val->i == 1 ) ? T("BS_AUTORADIOBUTTON") : T("BS_RADIOBUTTON"));
             *style = _mytcscpy( *style, _T(" | "));
             break;
@@ -826,18 +826,18 @@ CONTROL_INFO control_info[CONTROL_COUNT] = {
 
 
 
-CONTROL_INFO *GetControlInfo( UINT ctrl_id)
+CONTROL_INFO *twc_GetControlInfo( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
     return &control_info[ctrl_id - CONTROL_FIRST_ID];
 }
 
-PROPERTY_INFO *GetPropertyInfo( UINT ctrl_id, UINT prop_id)
+PROPERTY_INFO *twc_GetPropertyInfo( UINT ctrl_id, UINT prop_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
     TWC_CHECKIT( prop_id != PROPERTIES_ALL );
-    TWC_CHECKIT( prop_id < GetControlPropertiesCount( ctrl_id) );
+    TWC_CHECKIT( prop_id < twc_GetControlPropertiesCount( ctrl_id) );
 
     //Common properties
     if ( prop_id < COMMON_PROPERTIES_END )
@@ -849,42 +849,42 @@ PROPERTY_INFO *GetPropertyInfo( UINT ctrl_id, UINT prop_id)
     return &control_info[ctrl_id - CONTROL_FIRST_ID].property_info[prop_id];
 }
 
-UINT GetControlPropertiesCount( UINT ctrl_id)
+UINT twc_GetControlPropertiesCount( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
     return control_info[ctrl_id - CONTROL_FIRST_ID].properties_count;
 }
 
-TCHAR *GetControlClassname( UINT ctrl_id)
+TCHAR *twc_GetControlClassname( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
     return control_info[ctrl_id - CONTROL_FIRST_ID].class_name;
 }
 
-TCHAR *GetControlClassnameTWC( UINT ctrl_id)
+TCHAR *twc_GetControlClassnameTWC( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
     return control_info[ctrl_id - CONTROL_FIRST_ID].class_name_twc;
 }
 
-TCHAR *GetControlDefaultObjectName( UINT ctrl_id)
+TCHAR *twc_GetControlDefaultObjectName( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
     return control_info[ctrl_id - CONTROL_FIRST_ID].def_obj_name;
 }
 
-PROP_CODEGEN_CUSTOM_ACT_FUNC GetControlCodegenCustomAct( UINT ctrl_id)
+PROP_CODEGEN_CUSTOM_ACT_FUNC twc_GetControlCodegenCustomAct( UINT ctrl_id)
 {
     TWC_CHECKIT( ctrl_id < CONTROL_LAST_ID && ctrl_id != CTRL_ID_UNDEFINED);
 
     return control_info[ctrl_id - CONTROL_FIRST_ID].codegen_custom_act;
 }
 
-UINT GetPropertyIdByName( TCHAR *name, UINT ctrl_id)
+UINT twc_GetPropertyIdByName( TCHAR *name, UINT ctrl_id)
 {
     PROPERTY_INFO *propinfo;
     UINT prop_id;
@@ -898,8 +898,8 @@ UINT GetPropertyIdByName( TCHAR *name, UINT ctrl_id)
         }
     }
 
-    prop_count = GetControlPropertiesCount( ctrl_id);
-    for ( prop_id = COMMON_PROPERTIES_END, propinfo = GetPropertyInfo( ctrl_id, COMMON_PROPERTIES_END);
+    prop_count = twc_GetControlPropertiesCount( ctrl_id);
+    for ( prop_id = COMMON_PROPERTIES_END, propinfo = twc_GetPropertyInfo( ctrl_id, COMMON_PROPERTIES_END);
           prop_id < prop_count;
           prop_id++, propinfo++ ) {
         if ( _tcscmp( name, propinfo->name) == 0 ) {

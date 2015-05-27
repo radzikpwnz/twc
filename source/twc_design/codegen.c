@@ -31,7 +31,7 @@ static int MakeStyleStrings( TWC_OBJECT *obj,      /* object */
     PROP_CODEGEN_ACTION *act;
     VALUE *val;
     PROPERTY_INFO *propinfo;
-    UINT prop_id, prop_count, prop_flags;
+    UINT prop_id, prop_count;
     PROP_CODEGEN_CUSTOM_ACT_FUNC custom_act;
 
     style_s = malloc( 2048 * sizeof(TCHAR));
@@ -43,19 +43,18 @@ static int MakeStyleStrings( TWC_OBJECT *obj,      /* object */
     *p_ex = T('\0');
 
     /* Common actions */
-    custom_act = GetControlCodegenCustomAct( obj->id);
+    custom_act = twc_GetControlCodegenCustomAct( obj->id);
     if ( custom_act != NULL ) {
         custom_act( obj, PROPERTIES_ALL, &p_s, &p_ex);
     }
 
     /* Property-specific actions */
-    prop_count = GetControlPropertiesCount( obj->id);
+    prop_count = twc_GetControlPropertiesCount( obj->id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
-        prop_flags = GetObjectPropertyFlags( obj, prop_id);
-        propinfo = GetPropertyInfo( obj->id, prop_id);
-        val = GetObjectPropertyVal( obj, prop_id);
+        propinfo = twc_GetPropertyInfo( obj->id, prop_id);
+        val = twc_GetObjectPropertyVal( obj, prop_id);
 
-        act = &(GetPropertyInfo( obj->id, prop_id)->on_codegen_act);
+        act = &(twc_GetPropertyInfo( obj->id, prop_id)->on_codegen_act);
 
         if ( act->style_to_set != NULL && val->i == 1 ) {
             p_s = _mytcscpy( p_s, act->style_to_set);
@@ -141,9 +140,9 @@ static TCHAR *PrintObjectName( TCHAR *buf,     /* buffer */
 static const TCHAR *GetObjectClassnameToWrite( TWC_OBJECT *obj) /* object */
 {
     if ( obj->id == CTRL_ID_WINDOW ) {
-        return GetObjectPropertyVal( obj, WINDOW_CLASSNAME)->s;
+        return twc_GetObjectPropertyVal( obj, WINDOW_CLASSNAME)->s;
     } else {
-        return GetControlClassnameTWC( obj->id);
+        return twc_GetControlClassnameTWC( obj->id);
     }
 }
 

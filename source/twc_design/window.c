@@ -11,6 +11,9 @@
 #include "clipboard.h"
 #include "static.h"
 #include "project.h"
+#include "properties.h"
+
+#include "window.h"
 
 
 static int DeleteWindow( TWC_OBJECT *obj)
@@ -63,24 +66,17 @@ static int PaintWindow( HWND hwnd)
     return 1;
 }
 
-LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK ChildWndProc( TWC_OBJECT *obj, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-    TWC_OBJECT *cur_wnd;
     RECT rect;
     POINTS p;
     static int ctrl_move_speed = 1;
     TWC_BOOL is_ctrl_pressed;
-    TWC_OBJECT *obj;
-
-    cur_wnd = GetProp( hwnd, T("OBJECT_INFO"));
+    HWND hwnd = obj->hwnd;
 
     switch (msg) {
-        case WM_NCDESTROY:
-            RemoveProp( hwnd, T("OBJECT_INFO"));
-            cur_wnd->hwnd = NULL;
-            break;
         case WM_CLOSE:
-            if ( !DeleteWindow( cur_wnd) ) {
+            if ( !DeleteWindow( obj) ) {
                 return 0;
             }
             break;
@@ -99,7 +95,7 @@ LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                         break;
                     case 0x56:
                         /* Ctrl-V */
-                        PasteObjectsFromClipboard( cur_wnd);
+                        PasteObjectsFromClipboard( obj);
                         break;
                     case 0x53:
                         /* Ctrl-S */
@@ -133,7 +129,7 @@ LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	        break;
 		case WM_NCLBUTTONDOWN:
 			if ( IsToolboxControlSelected() == TWC_FALSE ) {
-				SetCurrentObject(cur_wnd);
+				SetCurrentObject( obj);
 				ClearSelection();
 			}
 			break;
@@ -141,12 +137,12 @@ LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if ( IsToolboxControlSelected() == TWC_FALSE ) {
                 SetFocus(hwnd); //kostyl
                 is_ctrl_pressed = ( GetAsyncKeyState( VK_CONTROL) >> (sizeof(SHORT) - 1) );
-                StartSelection( cur_wnd, LOWORD(lParam), HIWORD(lParam), !is_ctrl_pressed );
+                StartSelection( obj, LOWORD(lParam), HIWORD(lParam), !is_ctrl_pressed );
                 if ( !is_ctrl_pressed ) {
-                    SetCurrentObject( cur_wnd);
+                    SetCurrentObject( obj);
                 }
             } else {
-                obj = CreateControlFromToolbox( cur_wnd, RoundByGrid( LOWORD(lParam)), RoundByGrid( HIWORD(lParam)));
+                obj = CreateControlFromToolbox( obj, RoundByGrid( LOWORD(lParam)), RoundByGrid( HIWORD(lParam)));
                 if ( obj ) {
                     new_control = 1;
                     //StaticWndProc( obj->static_hwnd, WM_LBUTTONDOWN, wParam, MAKELPARAM(0,0));
@@ -156,7 +152,7 @@ LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             return 0;
 		case WM_LBUTTONDBLCLK:
-			CreateCodeWindow(cur_wnd, NULL);
+			CreateCodeWindow( obj, NULL);
 			return 0;
 		case WM_MOUSEMOVE:
 			if ( IsSelectionActive() ) {
@@ -169,14 +165,14 @@ LRESULT CALLBACK ChildWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 StopSelection();
 			}
 			return 0;
-		case WM_SIZE:
-            if ( cur_wnd->flags & OBJ_FLAG_CLIENTSIZE ) {
+        case WM_SIZE:
+            if ( obj->flags & OBJ_FLAG_CLIENTSIZE ) {
 			    GetClientRect( hwnd, &rect);
             } else {
                 GetWindowRect( hwnd, &rect);
             }
-			SetObjectPropertyInt(cur_wnd, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
-			SetObjectPropertyInt(cur_wnd, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
+			SetObjectPropertyInt( obj, COMMON_WIDTH, rect.right - rect.left, TWC_TRUE, TWC_FALSE);
+			SetObjectPropertyInt( obj, COMMON_HEIGHT, rect.bottom - rect.top, TWC_TRUE, TWC_FALSE);
 			
 			InvalidateRect(hwnd, NULL, 0);
 			UpdateWindow(hwnd);
@@ -269,7 +265,7 @@ int PreviewWindow(TWC_OBJECT *obj, HWND hParent)
 		if ( obj->id == CTRL_ID_UPDOWN ) {
 			SetWindowPos(hwnd, NULL, 0, 0, obj->width, obj->height, SWP_NOMOVE | SWP_NOZORDER);
 		} else if (obj->id == CTRL_ID_COMBOBOX) {
-			val = GetObjectPropertyVal( obj, COMBOBOX_TYPE);
+			val = twc_GetObjectPropertyVal( obj, COMBOBOX_TYPE);
 			if (val->i != 0) SetWindowPos( hwnd, NULL, 0, 0, obj->width, obj->height * 4, SWP_NOMOVE | SWP_NOZORDER);
 		}
 		SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);

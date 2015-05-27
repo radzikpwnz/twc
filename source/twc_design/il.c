@@ -158,7 +158,7 @@ static LEX_ID GetLex( LEX *lex) /* (out) lexeme */
 			if (*p1 != '=') goto ret;
 			*p1 = '\0';
 
-            i = GetPropertyIdByName( p, cur_obj_id);
+            i = twc_GetPropertyIdByName( p, cur_obj_id);
             if ( i != PROPERTY_UNDEFINED ) {
                 lex->id = LEX_PROPID;
 				lex->val.i = i;
@@ -193,7 +193,7 @@ static int ParsePropertyVal( TWC_OBJECT *obj, /* object */
 	}
 
     /* Compare property type and value type */
-	propinfo = GetPropertyInfo( obj->id, prop_id);
+	propinfo = twc_GetPropertyInfo( obj->id, prop_id);
 	if ( lex.id == LEX_STRVAL && propinfo->type != T_STR
          || lex.id == LEX_INTVAL && (propinfo->type != T_INT && propinfo->type != T_LIST && propinfo->type != T_BOOL) ) {
 		parse_err = ERR_SYNTAX;
@@ -406,12 +406,12 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
 	depth++;
 
     /* Write properties */
-    prop_count = GetControlPropertiesCount( obj->id);
+    prop_count = twc_GetControlPropertiesCount( obj->id);
     for ( prop_id = COMMON_PROPERTIES_BEGIN; prop_id < prop_count; prop_id++ ) {
-        prop_flags = GetObjectPropertyFlags( obj, prop_id);
+        prop_flags = twc_GetObjectPropertyFlags( obj, prop_id);
         if ( (prop_flags & PROPERTY_FLAG_SET) && !(prop_flags & PROPERTY_FLAG_DEFAULT) ) {
-            propinfo = GetPropertyInfo( obj->id, prop_id);
-            val = GetObjectPropertyVal( obj, prop_id);
+            propinfo = twc_GetPropertyInfo( obj->id, prop_id);
+            val = twc_GetObjectPropertyVal( obj, prop_id);
 
             /* Write tabs depending on current depth */
             for ( i = 0; i < depth; i++ ) {

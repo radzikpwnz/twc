@@ -25,15 +25,15 @@ struct tagPROPERTY {
 DLIST_CUSTOM_RD( PROPERTY);
 
 
-EXPORT PROPERTY *GetObjectProperty( TWC_OBJECT *obj, UINT prop_id);
-EXPORT VALUE *GetObjectPropertyVal( TWC_OBJECT *obj, int prop_id);
-EXPORT UINT GetObjectPropertyFlags( TWC_OBJECT *obj, int prop_id);
+EXPORT PROPERTY *twc_GetObjectProperty( TWC_OBJECT *obj, UINT prop_id);
+EXPORT VALUE *twc_GetObjectPropertyVal( TWC_OBJECT *obj, int prop_id);
+EXPORT UINT twc_GetObjectPropertyFlags( TWC_OBJECT *obj, int prop_id);
 
-EXPORT int SetObjectProperty( TWC_OBJECT *obj, UINT prop_id, const VALUE *new_val, TWC_BOOL update, TWC_BOOL apply);
-EXPORT int SetObjectPropertyInt( TWC_OBJECT *obj, UINT prop_id, int val, TWC_BOOL update, TWC_BOOL apply);
-EXPORT int SetObjectPropertyStr( TWC_OBJECT *obj, UINT prop_id, const TCHAR *val, TWC_BOOL update, TWC_BOOL apply);
+EXPORT int twc_SetObjectProperty( TWC_OBJECT *obj, UINT prop_id, const VALUE *new_val, TWC_BOOL update, TWC_BOOL apply);
+EXPORT int twc_SetObjectPropertyInt( TWC_OBJECT *obj, UINT prop_id, int val, TWC_BOOL update, TWC_BOOL apply);
+EXPORT int twc_SetObjectPropertyStr( TWC_OBJECT *obj, UINT prop_id, const TCHAR *val, TWC_BOOL update, TWC_BOOL apply);
 
-EXPORT int SetObjectPropertyDefaultValue( TWC_OBJECT *obj, UINT prop_id);
+EXPORT int twc_SetObjectPropertyDefaultValue( TWC_OBJECT *obj, UINT prop_id);
 
 
 #endif
