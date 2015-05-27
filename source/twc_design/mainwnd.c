@@ -28,7 +28,7 @@ void Resize(int width, int height);
 RECT mainwnd_rect;
 
 
-BOOL CALLBACK AboutDlgProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK AboutDlgProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	int lEvent = LOWORD(wParam);
 	LOGFONT lf;
@@ -239,7 +239,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   return DefFrameProc(hwnd, MDIClient.hwnd, msg, wParam, lParam);
 }
 
-void Resize(int width, int height)
+void Resize( int width, int height)
 {
     RECT rect;
     RECT status_rect;

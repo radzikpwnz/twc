@@ -11,7 +11,7 @@ static DLIST_PTWC_OBJECT selected_objects = {NULL, NULL, sizeof(TWC_OBJECT *)};
 static TWC_BOOL is_selection_active;
 
 /* Start point of selection */
-static x_start, y_start;
+static int x_start, y_start;
 
 /* Selection frame rect */
 static RECT frame_rect;

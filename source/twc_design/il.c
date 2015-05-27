@@ -219,7 +219,7 @@ static int ParseObject( TWC_OBJECT *parent) /* parent object */
     twc_PrepareObject( obj);
     obj->parent = parent;
 
-    while (1) {
+    while ( 1 ) {
         switch ( GetLex( &lex) ) {
             case LEX_PROPID:
                 if ( ParsePropertyVal( obj, lex.val.i) == 0 ) goto err;
@@ -316,7 +316,6 @@ int LoadProjectFromFile( TCHAR *path,            /* file path */
                          int *err_pos)           /* (out) error position */
 {
 	TCHAR *buf, *p;
-	int a = sizeof(TWC_OBJECT);
     TWCD_PROJECT *proj;
 
 	if ( err_pos ) *err_pos = 0;

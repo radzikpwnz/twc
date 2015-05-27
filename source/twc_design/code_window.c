@@ -144,7 +144,7 @@ LRESULT CALLBACK CodeWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 	return DefMDIChildProc(hwnd, msg, wParam, lParam);
 }
 
-int CreateCodeWindow(TWC_OBJECT *window, TCHAR *code)
+int CreateCodeWindow( TWC_OBJECT *window, TCHAR *code)
 {
 	TCHAR *title;
 

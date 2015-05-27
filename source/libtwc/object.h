@@ -80,23 +80,23 @@ EXPORT DLIST_PTWC_OBJECT *twc_GetParentChildList( TWC_OBJECT *obj);
 /**
  * Iterators for TWC_OBJECT lists.
  */
-#define OBJ_LIST_ITERATE_BEGIN( list )  \
-{                                       \
+#define OBJ_LIST_ITERATE_BEGIN( list )   \
+{                                        \
     DLIST_NODE_PTWC_OBJECT *next, *node; \
-    node = (list)->first;               \
-    while ( node != NULL ) {            \
+    node = (list)->first;                \
+    while ( node != NULL ) {             \
         next = node->next;
 
 #define OBJ_LIST_ITERATE_BEGIN_FROM_NODE( start_node )  \
-{                                       \
+{                                        \
     DLIST_NODE_PTWC_OBJECT *next, *node; \
-    node = start_node;                  \
-    while ( node != NULL ) {            \
+    node = (start_node);                 \
+    while ( node != NULL ) {             \
         next = node->next;
 
-#define OBJ_LIST_ITERATE_END()          \
-        node = next;                    \
-    }                                   \
+#define OBJ_LIST_ITERATE_END()           \
+        node = next;                     \
+    }                                    \
 }
 
 #endif

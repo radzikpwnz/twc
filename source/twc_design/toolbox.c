@@ -40,7 +40,7 @@ static TOOLBOX_BTN buttons[] = {
 static HWND tb_hwnd;
 
 UINT current_control_id;
-int tb_prev_id;
+UINT tb_prev_id;
 BOOL is_tmpl_valid = TWC_FALSE;
 
 int AddToolboxButtons( HWND hwnd)

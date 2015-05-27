@@ -88,7 +88,7 @@ int GetFileVersion(TCHAR *file, DWORD *ms, DWORD *ls)
 HBITMAP MakeBitMapTransparent(HBITMAP hbmSrc)
 {
 	HDC hdcSrc, hdcDst;
-	HBITMAP hbmNew;
+	HBITMAP hbmNew = NULL;
 	BITMAP bm;
 	COLORREF clrTP, clrBK;
 	int nRow, nCol;

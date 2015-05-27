@@ -58,7 +58,7 @@ static MAINTLB_BTN buttons[] ={
 
 static HWND tb_hwnd;
 
-int AddMainToolbarButtons(HWND hwnd)
+int AddMainToolbarButtons( HWND hwnd)
 {
 	TBADDBITMAP tb_ab;
 	TBBUTTON tbb;
@@ -67,20 +67,20 @@ int AddMainToolbarButtons(HWND hwnd)
 	int i, j;
     MAINTLB_BTN *cur_btn;
 
-	SendMessage(hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
+	SendMessage( hwnd, TB_BUTTONSTRUCTSIZE, (WPARAM)sizeof(TBBUTTON), 0);
 
-	hBmp = LoadImage(GetModuleHandle(NULL), MAKEINTRESOURCE(IDB_MAINTLB_ICONS), IMAGE_BITMAP, 256, 16, 0);
+	hBmp = LoadImage(GetModuleHandle( NULL), MAKEINTRESOURCE( IDB_MAINTLB_ICONS), IMAGE_BITMAP, 256, 16, 0);
 
-	hBmp = MakeBitMapTransparent(hBmp);
+	hBmp = MakeBitMapTransparent( hBmp);
 
-	SendMessage(hwnd, TB_SETINDENT, 2, 0);
-	SendMessage(hwnd, TB_SETMAXTEXTROWS, 0, 0);
+	SendMessage( hwnd, TB_SETINDENT, 2, 0);
+	SendMessage( hwnd, TB_SETMAXTEXTROWS, 0, 0);
 
 	tb_ab.hInst = NULL;
 	tb_ab.nID = (UINT_PTR)hBmp;
-	SendMessage(hwnd, TB_ADDBITMAP, 16, (LPARAM)&tb_ab);
+	SendMessage( hwnd, TB_ADDBITMAP, 16, (LPARAM)&tb_ab);
 
-	memset(&tbb_sep, 0, sizeof(tbb_sep));
+	memset( &tbb_sep, 0, sizeof(tbb_sep));
 	tbb_sep.fsStyle = BTNS_SEP;
 
 	tbb.fsState = TBSTATE_ENABLED;
@@ -92,19 +92,19 @@ int AddMainToolbarButtons(HWND hwnd)
 		tbb.iString = (INT_PTR)cur_btn->text;
 		tbb.dwData = j;
 
-		SendMessage(hwnd, TB_INSERTBUTTON, i, (LPARAM)&tbb);
+		SendMessage( hwnd, TB_INSERTBUTTON, i, (LPARAM)&tbb);
 
-		if (j == 2 || j == 4) {
-			SendMessage(hwnd, TB_INSERTBUTTON, i + 1, (LPARAM)&tbb_sep);
+		if ( j == 2 || j == 4 ) {
+			SendMessage( hwnd, TB_INSERTBUTTON, i + 1, (LPARAM)&tbb_sep);
 			i++;
-		} else if (j == 8 || j == 10 || j == 12) {
-			SendMessage(hwnd, TB_INSERTBUTTON, i + 1, (LPARAM)&tbb_sep);
+		} else if ( j == 8 || j == 10 || j == 12 ) {
+			SendMessage( hwnd, TB_INSERTBUTTON, i + 1, (LPARAM)&tbb_sep);
 			i++;
 		} 
 	}
 
     tb_hwnd = hwnd;
-	UpdateWindow(hwnd);
+	UpdateWindow( hwnd);
 	return 1;
 }
 
@@ -158,13 +158,13 @@ static void AlignLefts()
     DLIST_NODE_PTWC_OBJECT *node;
     int i;
 
-    if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
-	if (node) i = node->elem->x;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, i, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		node = node->next;
-	}
+    if ( GetSelectedObjects()->count <= 1 ) return;
+
+    node = GetSelectedObjects()->first;
+	i = node->elem->x;
+    OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
+		SetWindowPos( node->elem->hwnd, NULL, i, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -173,13 +173,13 @@ static void AlignTops()
     DLIST_NODE_PTWC_OBJECT *node;
     int i;
 
-    if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
-	if (node) i = node->elem->y;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		node = node->next;
-	}
+    if ( GetSelectedObjects()->count <= 1 ) return;
+
+    node = GetSelectedObjects()->first;
+	i = node->elem->y;
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -189,12 +189,12 @@ static void AlignRights()
     int i;
 
     if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
-	if (node) i = node->elem->x + node->elem->width;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, i - node->elem->width, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		node = node->next;
-	}
+
+    node = GetSelectedObjects()->first;
+	i = node->elem->x + node->elem->width;
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
+		SetWindowPos( node->elem->hwnd, NULL, i - node->elem->width, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+    OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -203,13 +203,13 @@ static void AlignBottoms()
     DLIST_NODE_PTWC_OBJECT *node;
     int i;
 
-    if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
-	if (node) i = node->elem->y + node->elem->height;
-	while (node != NULL) {
+    if ( GetSelectedObjects()->count <= 1 ) return;
+
+	node = GetSelectedObjects()->first;
+	i = node->elem->y + node->elem->height;
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
 		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, i - node->elem->height, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -219,21 +219,24 @@ static void CenterVertcally()
     RECT rect;
     int i, j, delta;
 
-    if (GetSelectedObjects()->count == 0) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count == 0 ) return;
+
+	node = GetSelectedObjects()->first;
 	i = j = node->elem->y;
-	while (node != NULL) {
-		if (node->elem->y < i) i = node->elem->y;
-		if (node->elem->y + node->elem->height > j) j = node->elem->y + node->elem->height;
-		node = node->next;
-	}
-	GetClientRect(GetSelectedObjects()->first->elem->parent->hwnd, &rect);
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
+        if ( node->elem->y < i ) {
+            i = node->elem->y;
+        }
+        if ( node->elem->y + node->elem->height > j ) {
+            j = node->elem->y + node->elem->height;
+        }
+	OBJ_LIST_ITERATE_END();
+
+	GetClientRect( GetSelectedObjects()->first->elem->parent->hwnd, &rect);
 	delta = (i + j) / 2 - (rect.top + rect.bottom) / 2;
-	(void *)node = (void *)GetSelectedObjects()->first;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, node->elem->y - delta, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y - delta, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -243,21 +246,24 @@ static void CenterAcross()
     RECT rect;
     int i, j, delta;
 
-    if (GetSelectedObjects()->count == 0) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count == 0 ) return;
+
+	node = GetSelectedObjects()->first;
 	i = j = node->elem->x;
-	while (node != NULL) {
-		if (node->elem->x < i) i = node->elem->x;
-		if (node->elem->x + node->elem->width > j) j = node->elem->x + node->elem->width;
-		node = node->next;
-	}
-	GetClientRect(GetSelectedObjects()->first->elem->parent->hwnd, &rect);
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
+        if ( node->elem->x < i ) {
+            i = node->elem->x;
+        }
+        if ( node->elem->x + node->elem->width > j ) {
+            j = node->elem->x + node->elem->width;
+        }
+	OBJ_LIST_ITERATE_END();
+
+	GetClientRect( GetSelectedObjects()->first->elem->parent->hwnd, &rect);
 	delta = (i + j) / 2 - (rect.right + rect.left) / 2;
-	(void *)node = (void *)GetSelectedObjects()->first;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x - delta, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x - delta, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -266,24 +272,27 @@ static void HorizontalGap()
     DLIST_NODE_PTWC_OBJECT *node;
     int i, j, delta, sum;
 
-    if (GetSelectedObjects()->count <= 2) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count <= 2 ) return;
+
+	node = GetSelectedObjects()->first;
 	i = j = node->elem->x;
 	sum = 0;
-	while (node != NULL) {
-		if (node->elem->x < i) i = node->elem->x;
-		if (node->elem->x + node->elem->width > j) j = node->elem->x + node->elem->width;
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
+        if ( node->elem->x < i ) {
+            i = node->elem->x;
+        }
+        if ( node->elem->x + node->elem->width > j ) {
+            j = node->elem->x + node->elem->width;
+        }
 		sum += node->elem->width;
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_END();
+
 	delta = j - i;
 	sum = ((delta - sum) > 0) ? ((delta - sum) / (GetSelectedObjects()->count - 1)) : -(int)((sum - delta) / (GetSelectedObjects()->count - 1));
-	(void *)node = (void *)GetSelectedObjects()->first;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, i, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
+		SetWindowPos( node->elem->hwnd, NULL, i, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 		i += node->elem->width + sum;
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -292,24 +301,27 @@ static void VerticalGap()
     DLIST_NODE_PTWC_OBJECT *node;
     int i, j, delta, sum;
 
-    if (GetSelectedObjects()->count <= 2) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count <= 2 ) return;
+
+	node = GetSelectedObjects()->first;
 	i = j = node->elem->y;
 	sum = 0;
-	while (node != NULL) {
-		if (node->elem->y < i) i = node->elem->y;
-		if (node->elem->y + node->elem->height > j) j = node->elem->y + node->elem->height;
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
+        if ( node->elem->y < i ) {
+            i = node->elem->y;
+        }
+        if ( node->elem->y + node->elem->height > j ) {
+            j = node->elem->y + node->elem->height;
+        }
 		sum += node->elem->height;
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_END();
+
 	delta = j - i;
 	sum = ((delta - sum) > 0) ? ((delta - sum) / (GetSelectedObjects()->count - 1)) : -(int)((sum - delta) / (GetSelectedObjects()->count - 1));
-	(void *)node = (void *)GetSelectedObjects()->first;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 		i += node->elem->height + sum;
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -318,13 +330,13 @@ static void MakeSameWidth()
     DLIST_NODE_PTWC_OBJECT *node;
     int i;
 
-    if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count <= 1 ) return;
+
+	node = GetSelectedObjects()->first;
 	i = node->elem->width;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, node->elem->y, i, node->elem->height, SWP_NOMOVE | SWP_NOZORDER);
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y, i, node->elem->height, SWP_NOMOVE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -333,13 +345,13 @@ static void MakeSameHeight()
     DLIST_NODE_PTWC_OBJECT *node;
     int j;
 
-    if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count <= 1 ) return;
+
+	node = GetSelectedObjects()->first;
 	j = node->elem->height;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, node->elem->y, node->elem->width, j, SWP_NOMOVE | SWP_NOZORDER);
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y, node->elem->width, j, SWP_NOMOVE | SWP_NOZORDER);
+    OBJ_LIST_ITERATE_END();
     return;
 }
 
@@ -348,13 +360,13 @@ static void MakeSameSize()
     DLIST_NODE_PTWC_OBJECT *node;
     int i, j;
 
-    if (GetSelectedObjects()->count <= 1) return;
-	(void *)node = (void *)GetSelectedObjects()->first;
+    if ( GetSelectedObjects()->count <= 1 ) return;
+
+	node = GetSelectedObjects()->first;
 	i = node->elem->width;
 	j = node->elem->height;
-	while (node != NULL) {
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, node->elem->y, i, j, SWP_NOMOVE | SWP_NOZORDER);
-		node = node->next;
-	}
+	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
+		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y, i, j, SWP_NOMOVE | SWP_NOZORDER);
+	OBJ_LIST_ITERATE_END();
     return;
 }
