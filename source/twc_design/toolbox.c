@@ -39,9 +39,9 @@ static TOOLBOX_BTN buttons[] = {
 
 static HWND tb_hwnd;
 
-UINT current_control_id;
-UINT tb_prev_id;
-BOOL is_tmpl_valid = TWC_FALSE;
+static UINT current_control_id;
+static UINT tb_prev_id;
+static BOOL is_tmpl_valid = TWC_FALSE;
 
 int AddToolboxButtons( HWND hwnd)
 {
@@ -108,7 +108,7 @@ int ProcessToolboxElemSelection( UINT tb_id)
 	
     SendMessage( tb_hwnd, TB_COMMANDTOINDEX, tb_id, 0);
     SendMessage( tb_hwnd, TB_GETBUTTON,
-                 SendMessage(tb_hwnd, TB_COMMANDTOINDEX, tb_id, 0),
+                 SendMessage( tb_hwnd, TB_COMMANDTOINDEX, tb_id, 0),
                  (LPARAM)&tbb);
 	i = tbb.dwData ;
 

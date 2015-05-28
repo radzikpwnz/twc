@@ -7,6 +7,8 @@
 #include "toolbox.h"
 #include "control_act.h"
 
+#define CONTROL_FRAME_WIDTH 2
+
 HCURSOR arrow_cursor, lr_cursor, tb_cursor, lt_cursor, tr_cursor;
 
 int LoadControlCursors()
@@ -40,7 +42,7 @@ static int PaintControlSelectionFrame( TWC_OBJECT *obj)
         lb.lbStyle = BS_SOLID;
         lb.lbColor = RGB(0, 130, 255); 
         lb.lbHatch = 0;
-        hPen = ExtCreatePen( PS_GEOMETRIC | PS_DASH, 2, &lb, 0, NULL);
+        hPen = ExtCreatePen( PS_GEOMETRIC | PS_DASH, CONTROL_FRAME_WIDTH, &lb, 0, NULL);
         hOldPen = SelectObject( hDC, hPen);
 
         Rectangle( hDC, rect.left + 1, rect.top + 1, rect.right, rect.bottom);

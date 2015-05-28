@@ -167,6 +167,9 @@ void SetCurrentObject( TWC_OBJECT *obj) /* object */
 {
     TWC_OBJECT *prev_obj;
 
+    TWC_CHECKIT( obj == NULL || IsObjectControl( obj) )
+    TWC_CHECKIT( current_object == NULL || IsObjectControl( current_object) );
+
     /* Process changed properties */
     if ( current_object ) {
         ProcessChangedProperties();
@@ -181,12 +184,12 @@ void SetCurrentObject( TWC_OBJECT *obj) /* object */
     }
 
     /* Redraw previous object if it is not window */
-    if ( prev_obj && IsObjectControl( prev_obj) ) {
+    if ( prev_obj && !IsObjectWindow( prev_obj) ) {
         RedrawWindow( prev_obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 
     /* Redraw current object if it is not window */
-    if ( current_object && current_object != prev_obj && IsObjectControl( current_object) && !IsObjectWindow( current_object) ) {
+    if ( current_object && current_object != prev_obj && !IsObjectWindow( current_object) ) {
         RedrawWindow( current_object->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     }
 
