@@ -47,8 +47,8 @@ DLIST_PTWC_OBJECT *GetSelectedObjects()
 int ClearSelection()
 {
     OBJ_LIST_ITERATE_BEGIN( &selected_objects);
-        OBJ_CLIENT_DATA( node->elem)->selected = 0;
-        RedrawWindow(node->elem->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+        OBJ_CLIENT_DATA( NODE()->elem)->selected = 0;
+        RedrawWindow( NODE()->elem->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     OBJ_LIST_ITERATE_END();
 
     DListFree( &selected_objects);
@@ -140,7 +140,7 @@ int ProcessSelectionFrameChange( int new_x, int new_y) /* new coordinates */
     }
 
     OBJ_LIST_ITERATE_BEGIN( &parent_wnd->child_list);
-        obj = node->elem;
+        obj = NODE()->elem;
         if ( !OBJ_CLIENT_DATA( obj)->selected ) {
             node_rect.left = obj->x;
             node_rect.top = obj->y;
@@ -148,24 +148,24 @@ int ProcessSelectionFrameChange( int new_x, int new_y) /* new coordinates */
             node_rect.bottom = node_rect.top + obj->height;
             if ( IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
                 AddObjectToSelection( obj);
-                RedrawWindow(node->elem->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
-                RedrawWindow( OBJ_CLIENT_DATA( node->elem)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+                RedrawWindow( obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+                RedrawWindow( OBJ_CLIENT_DATA( obj)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
             }
         }
     OBJ_LIST_ITERATE_END();
 
     OBJ_LIST_ITERATE_BEGIN_FROM_NODE( ( prev_sel_end != NULL ) ? prev_sel_end->next : selected_objects.first);
-        obj = node->elem;
+        obj = NODE()->elem;
         node_rect.left = obj->x;
         node_rect.top = obj->y;
         node_rect.right = node_rect.left + obj->width;
         node_rect.bottom = node_rect.top + obj->height;
         next = node->next;
-        if ( !IntersectRect(&res_rect, &node_rect, &frame_rect) ) {
+        if ( !IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
             OBJ_CLIENT_DATA( obj)->selected = 0;
-            RedrawWindow(node->elem->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
-            RedrawWindow( OBJ_CLIENT_DATA( node->elem)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
-            DListRemove( &selected_objects, node);
+            RedrawWindow( obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+            RedrawWindow( OBJ_CLIENT_DATA( obj)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+            DListRemove( &selected_objects, NODE());
         }
     OBJ_LIST_ITERATE_END();
 

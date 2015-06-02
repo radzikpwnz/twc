@@ -104,7 +104,7 @@ int twc_FreeObject( TWC_OBJECT *obj) /* object */
 
     /* Free child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-        twc_FreeObject( node->elem);
+        twc_FreeObject( NODE()->elem);
     OBJ_LIST_ITERATE_END();
 
     if ( IsObjectRoot( obj) ) {
@@ -210,7 +210,7 @@ int twc_CreateObjectWindow( TWC_OBJECT *obj,        /* object */
     /* Create childs */
     if ( create_childs ) {
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-            if ( twc_CreateObjectWindow( node->elem, TWC_TRUE, obj->hwnd) == 0 ) {
+            if ( twc_CreateObjectWindow( NODE()->elem, TWC_TRUE, obj->hwnd) == 0 ) {
                 return 0;
             }
         OBJ_LIST_ITERATE_END();
@@ -230,7 +230,7 @@ int twc_DestroyObjectWindow( TWC_OBJECT *obj,   /* object */
     /* Destroy childs */
     if ( obj->child_list.count != 0 ) {
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-            twc_DestroyObjectWindow( node->elem, free_obj);
+            twc_DestroyObjectWindow( NODE()->elem, free_obj);
         OBJ_LIST_ITERATE_END();
     }
 

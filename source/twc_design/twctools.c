@@ -27,7 +27,7 @@ DLIST_NODE_PTWC_OBJECT *FindObjectInList( TWC_OBJECT *obj,         /* object to 
                                           DLIST_PTWC_OBJECT *list) /* object list */
 {
     OBJ_LIST_ITERATE_BEGIN( list);
-        if ( node->elem == obj ) {
+        if ( NODE()->elem == obj ) {
             return node;
         }
     OBJ_LIST_ITERATE_END();
@@ -63,7 +63,7 @@ int PerformActionOnObjectsInList( DLIST_PTWC_OBJECT *list,   /* object list */
                                   int (*func)(TWC_OBJECT *)) /* function */
 {
     OBJ_LIST_ITERATE_BEGIN( list);
-        if ( func( node->elem) == 0 ) {
+        if ( func( NODE()->elem) == 0 ) {
             return 0;
         }
     OBJ_LIST_ITERATE_END();

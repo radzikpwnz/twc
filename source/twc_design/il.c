@@ -450,7 +450,7 @@ int WriteObjectInfo( FILE *fd,       /* file descriptor */
 
     /* Write object childs */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-		if ( WriteObjectInfo( fd, node->elem) == 0 ) {
+		if ( WriteObjectInfo( fd, NODE()->elem) == 0 ) {
 			return 0;
 		}
     OBJ_LIST_ITERATE_END();
@@ -491,7 +491,7 @@ int SaveProjectToFile( TWCD_PROJECT *project, TCHAR *path)
 	fwrite( TWCIL_HEADER, _tcslen( TWCIL_HEADER) * sizeof(TCHAR), 1, fd);
 
 	OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( project));
-		if ( WriteObjectInfo( fd, node->elem) == 0 ) {
+		if ( WriteObjectInfo( fd, NODE()->elem) == 0 ) {
 			buf = T("Error writing object");
 			MessageBox( hMainWnd, buf, T("Error"), 0);
 			fclose( fd);

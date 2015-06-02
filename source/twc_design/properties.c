@@ -71,7 +71,7 @@ int PropertyFilter( TWC_OBJECT *obj, /* object */
     /* Name check */
 	if ( prop_id == COMMON_NAME ) {
         OBJ_LIST_ITERATE_BEGIN( twc_GetParentChildList( obj));
-			if ( node->elem->name && _tcscmp( node->elem->name, val->s) == 0 && node->elem != obj ) {
+			if ( NODE()->elem->name && _tcscmp( NODE()->elem->name, val->s) == 0 && NODE()->elem != obj ) {
 				MessageBox( hMainWnd, T("Control with this name already exists!"), T("Error!"), 0);
 				return PF_WRONG;
 			}

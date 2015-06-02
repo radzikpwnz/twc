@@ -70,7 +70,7 @@ void UnloadCurrentProject()
     SetCurrentObject( NULL);
 
     OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( cur_project));
-        DestroyObjectWindow( node->elem, TWC_TRUE);
+        DestroyObjectWindow( NODE()->elem, TWC_TRUE);
     OBJ_LIST_ITERATE_END();
 
     FreeProject( cur_project);
@@ -90,7 +90,7 @@ int LoadCurrentProject()
     TWC_OBJECT *obj;
 
     OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( cur_project));
-        if ( CreateObjectWindow( node->elem, TWC_TRUE) == 0) {
+        if ( CreateObjectWindow( NODE()->elem, TWC_TRUE) == 0) {
             if ( MessageBox( hMainWnd, T("Error creating one of windows! Continue loading?"), T("Error"), MB_YESNO) == IDNO ) {
                 return 0;
             }

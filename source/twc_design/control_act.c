@@ -23,7 +23,7 @@ int DeleteSelectedObjects()
     }
 
     OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
-        DestroyObjectWindow( node->elem, TWC_TRUE);
+        DestroyObjectWindow( NODE()->elem, TWC_TRUE);
     OBJ_LIST_ITERATE_END();
 
     DListFree( GetSelectedObjects());
@@ -48,7 +48,7 @@ int CopySelectedObjects()
 int MoveSelectedObjects( int dx, int dy)
 {
     OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
-        SetWindowPos( node->elem->hwnd, NULL, node->elem->x + dx, node->elem->y + dy, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+        SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x + dx, NODE()->elem->y + dy, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
     OBJ_LIST_ITERATE_END();
 
     return 1;

@@ -186,7 +186,7 @@ static int GenerateObjectCode( TWC_OBJECT *obj) /* object */
 
     /* Generate code for child objects */
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-        if ( GenerateObjectCode( node->elem) == 0 ) {
+        if ( GenerateObjectCode( NODE()->elem) == 0 ) {
             return 0;
         }
         bufsize += objnamelen + 5;
@@ -206,7 +206,7 @@ static int GenerateObjectCode( TWC_OBJECT *obj) /* object */
 
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
             *p++ = '\t'; *p++ = '&';
-            p = PrintObjectName( p, node->elem);
+            p = PrintObjectName( p, NODE()->elem);
             *p++ = ','; *p++ = '\n';
         OBJ_LIST_ITERATE_END();
 
@@ -327,7 +327,7 @@ int GenerateProjectCode( TWCD_PROJECT *project) /* project */
 
     /* Write objects code */
     OBJ_LIST_ITERATE_BEGIN( GetProjectChildList( project));
-        if ( GenerateObjectCode( node->elem) == 0 ) break;
+        if ( GenerateObjectCode( NODE()->elem) == 0 ) break;
     OBJ_LIST_ITERATE_END();
 
     fclose( fd_code);

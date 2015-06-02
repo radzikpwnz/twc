@@ -163,7 +163,7 @@ static void AlignLefts()
     node = GetSelectedObjects()->first;
 	i = node->elem->x;
     OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos( node->elem->hwnd, NULL, i, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, i, NODE()->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -178,7 +178,7 @@ static void AlignTops()
     node = GetSelectedObjects()->first;
 	i = node->elem->y;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -193,7 +193,7 @@ static void AlignRights()
     node = GetSelectedObjects()->first;
 	i = node->elem->x + node->elem->width;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos( node->elem->hwnd, NULL, i - node->elem->width, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, i - NODE()->elem->width, NODE()->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
     OBJ_LIST_ITERATE_END();
     return;
 }
@@ -208,7 +208,7 @@ static void AlignBottoms()
 	node = GetSelectedObjects()->first;
 	i = node->elem->y + node->elem->height;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos(node->elem->hwnd, NULL, node->elem->x, i - node->elem->height, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, i - NODE()->elem->height, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -224,18 +224,18 @@ static void CenterVertcally()
 	node = GetSelectedObjects()->first;
 	i = j = node->elem->y;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
-        if ( node->elem->y < i ) {
-            i = node->elem->y;
+        if ( NODE()->elem->y < i ) {
+            i = NODE()->elem->y;
         }
-        if ( node->elem->y + node->elem->height > j ) {
-            j = node->elem->y + node->elem->height;
+        if ( NODE()->elem->y + NODE()->elem->height > j ) {
+            j = NODE()->elem->y + NODE()->elem->height;
         }
 	OBJ_LIST_ITERATE_END();
 
 	GetClientRect( GetSelectedObjects()->first->elem->parent->hwnd, &rect);
 	delta = (i + j) / 2 - (rect.top + rect.bottom) / 2;
 	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y - delta, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, NODE()->elem->y - delta, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -251,18 +251,18 @@ static void CenterAcross()
 	node = GetSelectedObjects()->first;
 	i = j = node->elem->x;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
-        if ( node->elem->x < i ) {
-            i = node->elem->x;
+        if ( NODE()->elem->x < i ) {
+            i = NODE()->elem->x;
         }
-        if ( node->elem->x + node->elem->width > j ) {
-            j = node->elem->x + node->elem->width;
+        if ( NODE()->elem->x + NODE()->elem->width > j ) {
+            j = NODE()->elem->x + NODE()->elem->width;
         }
 	OBJ_LIST_ITERATE_END();
 
 	GetClientRect( GetSelectedObjects()->first->elem->parent->hwnd, &rect);
 	delta = (i + j) / 2 - (rect.right + rect.left) / 2;
 	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x - delta, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x - delta, NODE()->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -278,20 +278,20 @@ static void HorizontalGap()
 	i = j = node->elem->x;
 	sum = 0;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
-        if ( node->elem->x < i ) {
-            i = node->elem->x;
+        if ( NODE()->elem->x < i ) {
+            i = NODE()->elem->x;
         }
-        if ( node->elem->x + node->elem->width > j ) {
-            j = node->elem->x + node->elem->width;
+        if ( NODE()->elem->x + NODE()->elem->width > j ) {
+            j = NODE()->elem->x + NODE()->elem->width;
         }
-		sum += node->elem->width;
+		sum += NODE()->elem->width;
 	OBJ_LIST_ITERATE_END();
 
 	delta = j - i;
 	sum = ((delta - sum) > 0) ? ((delta - sum) / (GetSelectedObjects()->count - 1)) : -(int)((sum - delta) / (GetSelectedObjects()->count - 1));
 	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
-		SetWindowPos( node->elem->hwnd, NULL, i, node->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		i += node->elem->width + sum;
+		SetWindowPos( NODE()->elem->hwnd, NULL, i, NODE()->elem->y, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		i += NODE()->elem->width + sum;
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -307,20 +307,20 @@ static void VerticalGap()
 	i = j = node->elem->y;
 	sum = 0;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node);
-        if ( node->elem->y < i ) {
-            i = node->elem->y;
+        if ( NODE()->elem->y < i ) {
+            i = NODE()->elem->y;
         }
-        if ( node->elem->y + node->elem->height > j ) {
-            j = node->elem->y + node->elem->height;
+        if ( NODE()->elem->y + NODE()->elem->height > j ) {
+            j = NODE()->elem->y + NODE()->elem->height;
         }
-		sum += node->elem->height;
+		sum += NODE()->elem->height;
 	OBJ_LIST_ITERATE_END();
 
 	delta = j - i;
 	sum = ((delta - sum) > 0) ? ((delta - sum) / (GetSelectedObjects()->count - 1)) : -(int)((sum - delta) / (GetSelectedObjects()->count - 1));
 	OBJ_LIST_ITERATE_BEGIN( GetSelectedObjects());
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
-		i += node->elem->height + sum;
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, i, 0, 0, SWP_NOSIZE | SWP_NOZORDER);
+		i += NODE()->elem->height + sum;
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -335,7 +335,7 @@ static void MakeSameWidth()
 	node = GetSelectedObjects()->first;
 	i = node->elem->width;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y, i, node->elem->height, SWP_NOMOVE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, NODE()->elem->y, i, NODE()->elem->height, SWP_NOMOVE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }
@@ -350,7 +350,7 @@ static void MakeSameHeight()
 	node = GetSelectedObjects()->first;
 	j = node->elem->height;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y, node->elem->width, j, SWP_NOMOVE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, NODE()->elem->y, NODE()->elem->width, j, SWP_NOMOVE | SWP_NOZORDER);
     OBJ_LIST_ITERATE_END();
     return;
 }
@@ -366,7 +366,7 @@ static void MakeSameSize()
 	i = node->elem->width;
 	j = node->elem->height;
 	OBJ_LIST_ITERATE_BEGIN_FROM_NODE( node->next);
-		SetWindowPos( node->elem->hwnd, NULL, node->elem->x, node->elem->y, i, j, SWP_NOMOVE | SWP_NOZORDER);
+		SetWindowPos( NODE()->elem->hwnd, NULL, NODE()->elem->x, NODE()->elem->y, i, j, SWP_NOMOVE | SWP_NOZORDER);
 	OBJ_LIST_ITERATE_END();
     return;
 }

@@ -139,7 +139,7 @@ int CreateObjectWindow( TWC_OBJECT *obj,        /* object */
 
     if ( create_childs ) {
         OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-            if ( CreateObjectWindow( node->elem, TWC_TRUE) == 0 ) {
+            if ( CreateObjectWindow( NODE()->elem, TWC_TRUE) == 0 ) {
                 return 0;
             }
         OBJ_LIST_ITERATE_END();
