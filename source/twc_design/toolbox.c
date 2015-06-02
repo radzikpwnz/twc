@@ -37,7 +37,7 @@ static TOOLBOX_BTN buttons[] = {
 	{NULL}
 };
 
-static HWND tb_hwnd;
+static HWND toolbox_hwnd;
 
 static UINT current_control_id;
 static UINT tb_prev_id;
@@ -73,7 +73,7 @@ int AddToolboxButtons( HWND hwnd)
 		SendMessage( hwnd, TB_INSERTBUTTON, i, (LPARAM)&tbb);
 	}
 
-	tb_hwnd = hwnd;
+	toolbox_hwnd = hwnd;
 	UpdateWindow( hwnd);
 	return 1;
 }
@@ -102,19 +102,19 @@ int ProcessToolboxElemSelection( UINT tb_id)
             ReleaseToolboxElemSelection();
             return 1;
         } else {
-			SendMessage( tb_hwnd, TB_CHECKBUTTON, tb_prev_id, 0);
+			SendMessage( toolbox_hwnd, TB_CHECKBUTTON, tb_prev_id, 0);
 		}
 	}
 	
-    SendMessage( tb_hwnd, TB_COMMANDTOINDEX, tb_id, 0);
-    SendMessage( tb_hwnd, TB_GETBUTTON,
-                 SendMessage( tb_hwnd, TB_COMMANDTOINDEX, tb_id, 0),
+    SendMessage( toolbox_hwnd, TB_COMMANDTOINDEX, tb_id, 0);
+    SendMessage( toolbox_hwnd, TB_GETBUTTON,
+                 SendMessage( toolbox_hwnd, TB_COMMANDTOINDEX, tb_id, 0),
                  (LPARAM)&tbb);
 	i = tbb.dwData ;
 
 	current_control_id =  buttons[i].ctrl_id;
 
-    SendMessage( tb_hwnd, TB_CHECKBUTTON, tb_id, 1);
+    SendMessage( toolbox_hwnd, TB_CHECKBUTTON, tb_id, 1);
     is_tmpl_valid = TWC_TRUE;
 
 	tb_prev_id = tb_id;
@@ -125,7 +125,7 @@ int ProcessToolboxElemSelection( UINT tb_id)
 int ReleaseToolboxElemSelection()
 {
     if ( tb_prev_id ) {
-        SendMessage( tb_hwnd, TB_CHECKBUTTON, tb_prev_id, 0);
+        SendMessage( toolbox_hwnd, TB_CHECKBUTTON, tb_prev_id, 0);
         tb_prev_id = 0;
     }
 

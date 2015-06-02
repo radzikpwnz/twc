@@ -56,7 +56,7 @@ static MAINTLB_BTN buttons[] ={
     {NULL}
 };
 
-static HWND tb_hwnd;
+static HWND main_toolbar_hwnd;
 
 int AddMainToolbarButtons( HWND hwnd)
 {
@@ -103,7 +103,7 @@ int AddMainToolbarButtons( HWND hwnd)
 		} 
 	}
 
-    tb_hwnd = hwnd;
+    main_toolbar_hwnd = hwnd;
 	UpdateWindow( hwnd);
 	return 1;
 }
@@ -113,8 +113,8 @@ void MainToolbarProc( UINT tb_id)
     TBBUTTON tbb;
     UINT code;
 
-    SendMessage( tb_hwnd, TB_GETBUTTON,
-                 SendMessage(tb_hwnd, TB_COMMANDTOINDEX, tb_id, 0),
+    SendMessage( main_toolbar_hwnd, TB_GETBUTTON,
+                 SendMessage(main_toolbar_hwnd, TB_COMMANDTOINDEX, tb_id, 0),
                  (LPARAM)&tbb);
 	code = tbb.dwData ;
 
