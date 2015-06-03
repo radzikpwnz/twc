@@ -160,7 +160,6 @@ int ProcessSelectionFrameChange( int new_x, int new_y) /* new coordinates */
         node_rect.top = obj->y;
         node_rect.right = node_rect.left + obj->width;
         node_rect.bottom = node_rect.top + obj->height;
-        next = node->next;
         if ( !IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
             OBJ_CLIENT_DATA( obj)->selected = 0;
             RedrawWindow( obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);

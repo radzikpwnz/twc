@@ -28,7 +28,7 @@ DLIST_NODE_PTWC_OBJECT *FindObjectInList( TWC_OBJECT *obj,         /* object to 
 {
     OBJ_LIST_ITERATE_BEGIN( list);
         if ( NODE()->elem == obj ) {
-            return node;
+            return NODE();
         }
     OBJ_LIST_ITERATE_END();
 

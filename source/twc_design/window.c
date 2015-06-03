@@ -274,7 +274,7 @@ int PreviewWindow(TWC_OBJECT *obj, HWND hParent)
 	}
 
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
-		if ( PreviewWindow( node->elem, hwnd) == 0 ) {
+		if ( PreviewWindow( NODE()->elem, hwnd) == 0 ) {
 			return 0;
 		}
 	OBJ_LIST_ITERATE_END();

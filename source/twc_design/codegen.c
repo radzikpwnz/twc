@@ -190,7 +190,7 @@ static int GenerateObjectCode( TWC_OBJECT *obj) /* object */
             return 0;
         }
         bufsize += objnamelen + 5;
-        bufsize += GetObjectNameLen( node->elem);
+        bufsize += GetObjectNameLen( NODE()->elem);
     OBJ_LIST_ITERATE_END();
 
     /* Allocate buffer */

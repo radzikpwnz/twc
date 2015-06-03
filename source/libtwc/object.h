@@ -80,29 +80,26 @@ EXPORT DLIST_PTWC_OBJECT *twc_GetParentChildList( TWC_OBJECT *obj);
 /**
  * Iterators for TWC_OBJECT lists.
  */
+#define NODE() (__node)
+
 #define OBJ_LIST_ITERATE_BEGIN( list )       \
 {                                            \
-    #define NODE() (__node)                  \
-    DLIST_NODE_PTWC_OBJECT *__next, *__node; \
-    __node = (list)->first;                  \
-    while ( __node != NULL ) {               \
-        __next = __node->next;
+    DLIST_NODE_PTWC_OBJECT *__next, *NODE(); \
+    NODE() = (list)->first;                  \
+    while ( NODE() != NULL ) {               \
+        __next = NODE()->next;
 
 #define OBJ_LIST_ITERATE_BEGIN_FROM_NODE( start_node )  \
 {                                            \
-    #define NODE() (__node)                  \
-    DLIST_NODE_PTWC_OBJECT *__next, *__node; \
-    __node = (start_node);                   \
-    while ( __node != NULL ) {               \
-        __next = __node->next;
+    DLIST_NODE_PTWC_OBJECT *__next, *NODE(); \
+    NODE() = (start_node);                   \
+    while ( NODE() != NULL ) {               \
+        __next = NODE()->next;
 
 #define OBJ_LIST_ITERATE_END()               \
-        __node = __next;                     \
-        #undef NODE()                        \
+        NODE() = __next;                     \
     }                                        \
 }
-
-#endif
 
 
 /* If object is control (incl window) or not */
@@ -115,3 +112,6 @@ EXPORT DLIST_PTWC_OBJECT *twc_GetParentChildList( TWC_OBJECT *obj);
 
 /* If object is undefined */
 #define IsObjectUndefined( obj) ( (obj)->id == CTRL_ID_UNDEFINED )
+
+
+#endif
