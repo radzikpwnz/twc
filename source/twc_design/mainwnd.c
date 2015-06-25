@@ -1,5 +1,4 @@
 #include <windows.h>
-#include <tchar.h>
 
 #include "twc_design.h"
 
@@ -22,7 +21,7 @@
 #define MAINTOOLBAR_HEIGHT 28
 
 
-void Resize(int width, int height);
+static void ResizeProc(int width, int height);
 
 
 RECT mainwnd_rect;
@@ -230,7 +229,7 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			}
 			return 0;
 		case WM_SIZE:
-			Resize(LOWORD(lParam), HIWORD(lParam));
+			ResizeProc(LOWORD(lParam), HIWORD(lParam));
 			return 0;
 		//case WM_ERASEBKGND:
 			//return 1;
@@ -239,29 +238,29 @@ LRESULT CALLBACK MainWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
   return DefFrameProc(hwnd, MDIClient.hwnd, msg, wParam, lParam);
 }
 
-void Resize( int width, int height)
+void ResizeProc( int width, int height)
 {
     RECT rect;
     RECT status_rect;
     int tb_x, pl_y, tb_cx;
 
-    GetClientRect(hMainWnd, &mainwnd_rect);
-    GetClientRect(StatusBar.hwnd, &status_rect);
-    SendMessage(StatusBar.hwnd, WM_SIZE,  0, 0);
+    GetClientRect( hMainWnd, &mainwnd_rect);
+    GetClientRect( StatusBar.hwnd, &status_rect);
+    SendMessage( StatusBar.hwnd, WM_SIZE,  0, 0);
 
-    tb_x = MAX(mainwnd_rect.right * 4 / 5, mainwnd_rect.right - MAX_TOOLBAR_SIZE);
+    tb_x = MAX( mainwnd_rect.right * 4 / 5, mainwnd_rect.right - MAX_TOOLBAR_SIZE);
     pl_y = mainwnd_rect.bottom * 3 / 5;
-    tb_cx = MIN(mainwnd_rect.right  / 5 + 1, MAX_TOOLBAR_SIZE);
+    tb_cx = MIN( mainwnd_rect.right  / 5 + 1, MAX_TOOLBAR_SIZE);
 
-    SendMessage(MainToolbar.hwnd, TB_GETITEMRECT,  0, (LPARAM)&rect);
-    SendMessage(MainToolbar.hwnd, TB_SETBUTTONSIZE,  0, MAKELONG(MAINTOOLBAR_HEIGHT - rect.top - 2, MAINTOOLBAR_HEIGHT - rect.top - 2));
-    SetWindowPos(MainToolbar.hwnd, 0, -1, -1, mainwnd_rect.right + 2, MAINTOOLBAR_HEIGHT + 1, SWP_NOZORDER);
+    SendMessage( MainToolbar.hwnd, TB_GETITEMRECT,  0, (LPARAM)&rect);
+    SendMessage( MainToolbar.hwnd, TB_SETBUTTONSIZE,  0, MAKELONG( MAINTOOLBAR_HEIGHT - rect.top - 2, MAINTOOLBAR_HEIGHT - rect.top - 2));
+    SetWindowPos( MainToolbar.hwnd, 0, -1, -1, mainwnd_rect.right + 2, MAINTOOLBAR_HEIGHT + 1, SWP_NOZORDER);
 
-    SetWindowPos(MDIClient.hwnd, 0, 0, MAINTOOLBAR_HEIGHT, tb_x, mainwnd_rect.bottom - status_rect.bottom - MAINTOOLBAR_HEIGHT, SWP_NOZORDER);
+    SetWindowPos( MDIClient.hwnd, 0, 0, MAINTOOLBAR_HEIGHT, tb_x, mainwnd_rect.bottom - status_rect.bottom - MAINTOOLBAR_HEIGHT, SWP_NOZORDER);
 
-    SendMessage(Toolbox.hwnd, TB_SETBUTTONSIZE,  0, MAKELONG(tb_cx, 15));
-    SetWindowPos(Toolbox.hwnd, NULL,  tb_x, MAINTOOLBAR_HEIGHT, tb_cx, pl_y - MAINTOOLBAR_HEIGHT, SWP_NOZORDER);
-    SetWindowPos(hPropList, NULL, tb_x, pl_y, tb_cx, mainwnd_rect.bottom * 2 / 5 - status_rect.bottom + 1, SWP_NOZORDER);
+    SendMessage( Toolbox.hwnd, TB_SETBUTTONSIZE,  0, MAKELONG( tb_cx, 15));
+    SetWindowPos( Toolbox.hwnd, NULL,  tb_x, MAINTOOLBAR_HEIGHT, tb_cx, pl_y - MAINTOOLBAR_HEIGHT, SWP_NOZORDER);
+    SetWindowPos( hPropList, NULL, tb_x, pl_y, tb_cx, mainwnd_rect.bottom * 2 / 5 - status_rect.bottom + 1, SWP_NOZORDER);
     return;
 }
 

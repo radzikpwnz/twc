@@ -11,7 +11,7 @@
  * Create control from toolbox.
  */
 TWC_OBJECT *CreateControlFromToolbox( TWC_OBJECT *cur_wnd, /* parent window object */
-                                     int x, int y)       /* position */
+                                      int x, int y)        /* position */
 {
     TWC_OBJECT *obj;
 

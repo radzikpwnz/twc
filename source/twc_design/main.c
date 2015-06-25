@@ -124,6 +124,8 @@ static int Init()
     ShowWindow( hMainWnd, SW_SHOWMAXIMIZED);
 	UpdateWindow( hMainWnd);
 
+    twc_SetObjectsClientDataSize( sizeof( TWC_OBJECT_CLIENT_DATA));
+
     actNewProject();
 
     return 1;
