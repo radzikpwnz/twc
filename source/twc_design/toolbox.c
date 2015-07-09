@@ -25,7 +25,7 @@ static TOOLBOX_BTN buttons[] = {
 	{ T("Static"),           CTRL_ID_STATIC,       4 },
 	{ T("Edit control"),     CTRL_ID_EDIT,         5 },
 	{ T("List box"),         CTRL_ID_LISTBOX,      6 },
-	{ T("Combo box (TEST)"), CTRL_ID_COMBOBOX,     7 },
+	{ T("Combo box"),        CTRL_ID_COMBOBOX,     7 },
 	{ T("Slider control"),   CTRL_ID_SLIDER,       8 },
 	{ T("Progress bar"),     CTRL_ID_PROGRESSBAR,  9 },
 	{ T("IP address"),       CTRL_ID_IPADDRESS,    10 },

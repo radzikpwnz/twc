@@ -234,6 +234,25 @@ int InitControlView(TWC_OBJECT *obj, HWND hwnd)
 	return 1;
 }
 
+static DWORD StyleFilterForPreview( TWC_OBJECT *obj)
+{
+    return obj->style;
+}
+
+static DWORD ExStyleFilterForPreview( TWC_OBJECT *obj)
+{
+    DWORD exstyle;
+
+	exstyle = obj->exstyle;
+	
+    if ( IsObjectWindow( obj) )
+    {
+        exstyle = exstyle & ~(WS_EX_MDICHILD);
+    }   
+
+	return exstyle;
+}
+
 int PreviewWindow(TWC_OBJECT *obj, HWND hParent)
 {
 	RECT rect;
@@ -256,21 +275,21 @@ int PreviewWindow(TWC_OBJECT *obj, HWND hParent)
         AdjustWindowRect( &rect, obj->style, FALSE);
     }
 
-	hwnd = CreateWindowEx( obj->exstyle, ((obj->id != -1) ? obj->classname : T("DefaultWnd")), obj->title, obj->style,
+	hwnd = CreateWindowEx( ExStyleFilterForPreview( obj), ((obj->id != CTRL_ID_WINDOW) ? obj->classname : T("DefaultWnd")), obj->title, StyleFilterForPreview( obj),
                            x, y, rect.right - rect.left, rect.bottom - rect.top, hParent, NULL, GetModuleHandle(NULL), NULL);
 
 	if ( !hwnd ) return 0;
 
 	if ( hParent != hMainWnd ) {
 		if ( obj->id == CTRL_ID_UPDOWN ) {
-			SetWindowPos(hwnd, NULL, 0, 0, obj->width, obj->height, SWP_NOMOVE | SWP_NOZORDER);
-		} else if (obj->id == CTRL_ID_COMBOBOX) {
+			SetWindowPos( hwnd, NULL, 0, 0, obj->width, obj->height, SWP_NOMOVE | SWP_NOZORDER);
+		} else if ( obj->id == CTRL_ID_COMBOBOX ) {
 			val = twc_GetObjectPropertyVal( obj, COMBOBOX_TYPE);
 			if (val->i != 0) SetWindowPos( hwnd, NULL, 0, 0, obj->width, obj->height * 4, SWP_NOMOVE | SWP_NOZORDER);
 		}
-		SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-		SendMessage(hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), 0);
-		InitControlView(obj, hwnd);
+		SetWindowPos( hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		SendMessage( hwnd, WM_SETFONT, (WPARAM)GetStockObject(DEFAULT_GUI_FONT), 0);
+		InitControlView( obj, hwnd);
 	}
 
     OBJ_LIST_ITERATE_BEGIN( &obj->child_list);
