@@ -17,7 +17,7 @@ Usage:
 	You must initialize members of DLIST struct manually to {NULL, NULL, sizeof(type), 0}
 */
 
-typedef struct tagDLIST_ABSTRACT{
+typedef struct tagDLIST_ABSTRACT {
 	void *first;
 	void *last;
 	UINT elem_size;
@@ -40,7 +40,7 @@ typedef struct tagDLIST_ABSTRACT{
 	}
 
 #define DLIST_CUSTOM(type) \
-	typedef DLIST_NODE(type) DLIST_NODE_##type; \
+	typedef DLIST_NODE(type) DLIST_NODE_##type, *PDLIST_NODE_##type; \
 	typedef struct tagDLIST_##type { \
 		DLIST_NODE_##type *first; \
 		DLIST_NODE_##type *last; \
@@ -61,17 +61,16 @@ typedef struct tagDLIST_ABSTRACT{
 	}
 
 #define DLIST_CUSTOM_FD(type) \
-	typedef DLIST_NODE_FD(type) DLIST_NODE_##type; \
-	typedef struct tagDLIST_##type DLIST_##type;
-
-#define DLIST_CUSTOM_RD(type) \
-	DLIST_NODE_RD(type);\
-	struct tagDLIST_##type{ \
+	typedef DLIST_NODE_FD(type) DLIST_NODE_##type, *PDLIST_NODE_##type; \
+	typedef struct tagDLIST_##type { \
 		DLIST_NODE_##type *first; \
 		DLIST_NODE_##type *last; \
 		UINT elem_size; \
 		UINT count; \
-	};
+	} DLIST_##type;
+
+#define DLIST_CUSTOM_RD(type) \
+	DLIST_NODE_RD(type);\
 
 
 void *DListAdd(void *list, void *ins_after, void *elem);
@@ -83,6 +82,7 @@ elem - pointer to item to add
 */
 
 void *DListAddExist(void *list, void *ins_after, void *elem);
+void *DListAddCustomSize(void *list, void *ins_after, void *elem, UINT size);
 
 void DListGet(void *list, void *pos, void *buf, int remove);
 /*
@@ -119,6 +119,10 @@ void *DListElemToNode(void *elem);
 
 void *DListAlloc(void *list);
 
-void DListClone(void *src, void *dst);
+void DListExchange(void *pos1, void *pos2);
+
+void DListMove(void *list, void *node, void *ins_after);
+
+void DListClone(void *src, void *first, void *last, void *dst);
 
 #endif

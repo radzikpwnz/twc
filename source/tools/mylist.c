@@ -74,6 +74,38 @@ void *DListAddExist(void *list, void *ins_after, void *elem)
 	return pnew;
 }
 
+void *DListAddCustomSize(void *list, void *ins_after, void *elem, UINT size)
+{
+	void *pnew;
+
+	pnew = malloc(size + 2 * sizeof(void *));
+	if (FIRST(list) == NULL) {
+		NEXT(pnew) = NULL;
+		PREV(pnew) = NULL;
+		FIRST(list) = pnew;
+		LAST(list) = pnew;
+	} else if (ins_after == NULL) {
+		NEXT(pnew) = FIRST(list);
+		PREV(pnew) = NULL;
+		PREV(FIRST(list))= pnew;
+		FIRST(list) = pnew;
+	} else if (ins_after == (void *)-1 || ins_after == LAST(list)) {
+		NEXT(pnew) = NULL;
+		PREV(pnew) = LAST(list);
+		NEXT(LAST(list)) = pnew;
+		LAST(list) = pnew;
+	} else {
+		NEXT(pnew) = NEXT(ins_after);
+		PREV(pnew) = ins_after;
+		NEXT(ins_after) = pnew;
+		PREV(NEXT(pnew)) = pnew;
+	}
+
+	memcpy(ELEM(pnew), elem, size);
+	COUNT(list)++;
+	return pnew;
+}
+
 void DListGet(void *list, void *pos, void *buf, int remove)
 {
 	if (pos == NULL) return;
@@ -173,36 +205,6 @@ void DListInsertList(void *list, void *ins_after, void *list_to_insert)
 	return;
 }
 
-void DListClone(void *src, void *dst)
-{
-	BYTE *start, *p, *prev;
-	void *node;
-	int node_size;
-
-	node_size = ELEMSIZE(src) + 2 * sizeof(void *);
-	prev = malloc(node_size);
-	start = p = malloc(node_size);
-
-	node = FIRST(src);
-	FIRST(dst) = p;
-	while (node != NULL) {
-		memcpy(ELEM(p), ELEM(node), ELEMSIZE(src));
-		PREV(p) = prev;
-		NEXT(prev) = p;
-
-		prev = p;
-		p = malloc(node_size);
-		node = NEXT(node);
-	}
-	free(p);
-	p = prev;
-	NEXT(p) = NULL;
-	free(PREV(start));
-	PREV(start) = NULL;
-	LAST(dst) = p;
-	COUNT(dst) = COUNT(src);
-}
-
 void *DListElemToNode(void *elem)
 {
 	return (BYTE *)elem - 2 * sizeof(void *);
@@ -211,4 +213,80 @@ void *DListElemToNode(void *elem)
 void *DListAlloc(void *list)
 {
 	return malloc(ELEMSIZE(list) + 2 * sizeof(void *));
+}
+
+void DListExchange(void *pos1, void *pos2)
+{
+	if (PREV(pos1)) NEXT(PREV(pos1)) = pos2;
+	if (NEXT(pos1)) PREV(NEXT(pos1)) = pos2;
+
+	if (PREV(pos2)) NEXT(PREV(pos2)) = pos1;
+	if (NEXT(pos2)) PREV(NEXT(pos2)) = pos1;
+
+	return;
+}
+
+void DListMove(void *list, void *node, void *ins_after)
+{
+	if (node == ins_after) return;
+
+	if (PREV(node)) NEXT(PREV(node)) = NEXT(node);
+	if (NEXT(node)) PREV(NEXT(node)) = PREV(node);
+
+	//if (PREV(ins_after)) NEXT(PREV(ins_after)) = node;
+	//if (NEXT(ins_after)) PREV(NEXT(ins_after)) = node;
+
+	if (ins_after == NULL) {
+		NEXT(node) = FIRST(list);
+		PREV(node) = NULL;
+		PREV(FIRST(list))= node;
+		FIRST(list) = node;
+	} else if (ins_after == (void *)-1 || ins_after == LAST(list)) {
+		NEXT(node) = NULL;
+		PREV(node) = LAST(list);
+		NEXT(LAST(list)) = node;
+		LAST(list) = node;
+	} else {
+		NEXT(node) = NEXT(ins_after);
+		PREV(node) = ins_after;
+		NEXT(ins_after) = node;
+		PREV(NEXT(node)) = node;
+	}
+
+	return;
+}
+
+void DListClone(void *src, void *first, void *last, void *dst)
+{
+	BYTE *start, *p, *prev;
+	void *node, *last_node;
+	int node_size;
+	int count;
+
+	node_size = ELEMSIZE(src) + 2 * sizeof(void *);
+	prev = malloc(node_size);
+	start = p = malloc(node_size);
+
+	node = (first == NULL) ? FIRST(src) : first;
+	last_node = (last == (void *)-1) ? NULL : NEXT(last);
+	FIRST(dst) = p;
+	count = 0;
+	while (node != last_node) {
+		memcpy(ELEM(p), ELEM(node), ELEMSIZE(src));
+		PREV(p) = prev;
+		NEXT(prev) = p;
+
+		prev = p;
+		p = malloc(node_size);
+		node = NEXT(node);
+		count++;
+	}
+	free(p);
+	p = prev;
+	NEXT(p) = NULL;
+	free(PREV(start));
+	PREV(start) = NULL;
+	LAST(dst) = p;
+	ELEMSIZE(dst) = ELEMSIZE(src);
+	COUNT(dst) = count;
 }
