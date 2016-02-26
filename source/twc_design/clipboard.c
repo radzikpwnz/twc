@@ -40,7 +40,7 @@ int AddObjectToClipboard( TWC_OBJECT *obj) /* object */
 int AddObjectListToClipboard( DLIST_PTWC_OBJECT *obj_list) /* object list */
 {
     ClearClipboard();
-    DListClone( obj_list, &clipboard_content);
+    DListClone( obj_list, NULL, (void *)-1, &clipboard_content);
     return 1;
 }
 

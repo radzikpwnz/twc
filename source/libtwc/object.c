@@ -288,8 +288,8 @@ static LRESULT CALLBACK ObjectWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARA
             /* Write new values to properties */
 			GetWindowRect( hwnd, &rect);
 			MapWindowPoints( HWND_DESKTOP, GetParent(hwnd), (POINT *)&rect, 1);
-			twc_SetObjectPropertyInt(obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
-            twc_SetObjectPropertyInt(obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
+			twc_SetObjectPropertyInt( obj, COMMON_X, rect.left, TWC_TRUE, TWC_FALSE);
+            twc_SetObjectPropertyInt( obj, COMMON_Y, rect.top, TWC_TRUE, TWC_FALSE);
 			break;
 		case WM_SIZE:
             /* Write new values to properties */
