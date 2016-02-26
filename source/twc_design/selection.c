@@ -64,6 +64,11 @@ int AddObjectToSelection( TWC_OBJECT *obj) /* object */
 
     OBJ_CLIENT_DATA( obj)->selected = 1;
     DListAdd( &selected_objects, (void *)-1, &obj);
+    /*if ( selected_objects.count == 1) {
+        SetCurrentObject( obj);
+    } else {
+        SetCurrentObject( obj->parent);
+    }*/
     return 1;
 }
 
@@ -76,6 +81,12 @@ int DeleteObjectFromSelection( TWC_OBJECT *obj) /* object */
 
     OBJ_CLIENT_DATA( obj)->selected = 0;
     DListRemove( &selected_objects, FindObjectInList( obj, &selected_objects));
+    prev_sel_end = selected_objects.last;
+    /*if ( selected_objects.count == 1 ) {
+        SetCurrentObject( selected_objects.first->elem);
+    } else if ( selected_objects.count == 0 ) {
+        SetCurrentObject( obj->parent);
+    }*/
     return 1;
 }
 
@@ -117,6 +128,8 @@ int ProcessSelectionFrameChange( int new_x, int new_y) /* new coordinates */
 {
     RECT update_rect, node_rect, res_rect;
     TWC_OBJECT *obj;
+    BOOL ctrl_pressed = ( GetAsyncKeyState( VK_CONTROL) >> (sizeof(SHORT) - 1) );
+    BOOL add;
 
     TWC_CHECKIT( is_selection_active );
 
@@ -141,32 +154,57 @@ int ProcessSelectionFrameChange( int new_x, int new_y) /* new coordinates */
 
     OBJ_LIST_ITERATE_BEGIN( &parent_wnd->child_list);
         obj = NODE()->elem;
-        if ( !OBJ_CLIENT_DATA( obj)->selected ) {
-            node_rect.left = obj->x;
-            node_rect.top = obj->y;
-            node_rect.right = node_rect.left + obj->width;
-            node_rect.bottom = node_rect.top + obj->height;
+        node_rect.left = obj->x;
+        node_rect.top = obj->y;
+        node_rect.right = node_rect.left + obj->width;
+        node_rect.bottom = node_rect.top + obj->height;
+
+        if ( ctrl_pressed ) {
             if ( IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
+                if ( OBJ_CLIENT_DATA( obj)->selected ) {
+                    DeleteObjectFromSelection( obj);
+                } else {
+                    AddObjectToSelection( obj);
+                }
+            }/* else {
+                if ( OBJ_CLIENT_DATA( obj)->selected ) {
+                    DeleteObjectFromSelection( obj);
+                } else {
+                    AddObjectToSelection( obj)
+                }
+            }*/
+            /*if ( OBJ_CLIENT_DATA( obj)->selected
+                 && IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
+                DeleteObjectFromSelection( obj);
+            } else if ( !OBJ_CLIENT_DATA( obj)->selected
+                        && IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
                 AddObjectToSelection( obj);
-                RedrawWindow( obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
-                RedrawWindow( OBJ_CLIENT_DATA( obj)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+            }*/
+        } else {
+            if ( !OBJ_CLIENT_DATA( obj)->selected
+                 && IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
+                AddObjectToSelection( obj);
+            } else if ( OBJ_CLIENT_DATA( obj)->selected
+                        && !IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
+                DeleteObjectFromSelection( obj);
             }
         }
+        RedrawWindow( obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
+        RedrawWindow( OBJ_CLIENT_DATA( obj)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
     OBJ_LIST_ITERATE_END();
 
-    OBJ_LIST_ITERATE_BEGIN_FROM_NODE( ( prev_sel_end != NULL ) ? prev_sel_end->next : selected_objects.first);
+    /*OBJ_LIST_ITERATE_BEGIN_FROM_NODE( ( prev_sel_end != NULL ) ? prev_sel_end->next : selected_objects.first);
         obj = NODE()->elem;
         node_rect.left = obj->x;
         node_rect.top = obj->y;
         node_rect.right = node_rect.left + obj->width;
         node_rect.bottom = node_rect.top + obj->height;
         if ( !IntersectRect( &res_rect, &node_rect, &frame_rect) ) {
-            OBJ_CLIENT_DATA( obj)->selected = 0;
+            DeleteObjectFromSelection( obj);
             RedrawWindow( obj->hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
             RedrawWindow( OBJ_CLIENT_DATA( obj)->static_hwnd, NULL, NULL, RDW_UPDATENOW | RDW_INVALIDATE | RDW_FRAME);
-            DListRemove( &selected_objects, NODE());
         }
-    OBJ_LIST_ITERATE_END();
+    OBJ_LIST_ITERATE_END();*/
 
     //SendMessage(hwnd, WM_PAINT, 0, 0);
     UpdateWindow( parent_wnd->hwnd);
