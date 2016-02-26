@@ -57,6 +57,21 @@ static int PaintControlSelectionFrame( TWC_OBJECT *obj)
     return 1;
 }
 
+static void SizingStart( int x, int y)
+{
+
+}
+
+static void SizingProcess( int x, int y)
+{
+
+}
+
+static void SizingEnd()
+{
+
+}
+
 LRESULT CALLBACK StaticWndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     TWC_OBJECT *obj;

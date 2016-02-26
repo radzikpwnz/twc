@@ -35,6 +35,7 @@ struct tagTWC_OBJECT {
     TCHAR *classname;                   /* class name */
     HWND hwnd;                          /* object window HWND */          
     WNDPROC orig_wndproc;               /* original window procedure */
+    WNDPROC custom_wndproc;
     TWC_CLIENTPROC client_wndproc;      /* client window procedure */
 
     DWORD style;                        /* style and extended style */
