@@ -26,7 +26,7 @@ int GenerateObjectName( TWC_OBJECT *obj) /* object */
     /* Add number after default name until it become unique */
 next:
 	while (!ok) {
-		_stprintf( buf, T("%s%d"), default_name, ++control_names_usage[obj->id]);
+		_stprintf( buf, T("%s%d"), default_name, ++control_names_usage[obj->id - CONTROL_FIRST_ID]);
 
         obj_node = twc_GetParentChildList( obj)->first;
 		while (obj_node != NULL) {
