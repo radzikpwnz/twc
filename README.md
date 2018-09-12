@@ -1,6 +1,8 @@
 # Tiny Window Creator
 Lightweight GUI designer & framework(soon) for Windows.
 
+![Alt text](doc/screenshot.jpg)
+
 ## Features:
 * Create any number of windows and controls on them
 * Size, move, copy/paste any control or control group
